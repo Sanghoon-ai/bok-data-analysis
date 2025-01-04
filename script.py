@@ -40,10 +40,11 @@ df2[['datetime', 'DATA_VALUE']].to_csv('선행지수순환변동치.csv', index=
 
 # KOSPI 데이터 가져오기 및 CSV 저장
 enddate = datetime.now().strftime('%Y-%m-%d')
-kospi = yf.download('^KS11', '1990-01-01', enddate, auto_adjust=True)
-
-# KOSPI 데이터를 CSV로 저장
-kospi.to_csv('KOSPI.csv', encoding='utf-8-sig')
+try:
+    kospi = yf.download('^KS11', '1990-01-01', enddate, auto_adjust=True)
+    kospi.to_csv('KOSPI.csv', encoding='utf-8-sig')
+except Exception as e:
+    print("Error downloading KOSPI data:", e)
 
 # USD/KRW 환율 데이터 가져오기 (한국은행 API에서 FXX001으로 가져오기)
 url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/1/100/731Y001/D/19900101/20241231/0000001'
