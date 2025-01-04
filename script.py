@@ -1,5 +1,7 @@
 import requests
 import pandas as pd
+import yfinance as yf
+from datetime import datetime
 
 # API Key와 URL 설정
 apikey='JYPDDDCMTDNB0AOZLW0K'
