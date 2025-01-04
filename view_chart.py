@@ -103,7 +103,7 @@ try:
         print("chart.html 파일이 정상적으로 생성되었습니다.")
         print("HTML 파일이 생성되었습니다. 'chart.html' 파일을 열어보세요.")
     else:
-        print("chart.html 파일 생성에 실패했습니다.").
+        print("chart.html 파일 생성에 실패했습니다.")
     
 except Exception as e:
     print(f"Error occurred: {e}")
