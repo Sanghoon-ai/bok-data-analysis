@@ -40,7 +40,9 @@ jobs:
         git pull origin main  # 원격 저장소에서 최신 변경사항을 pull
 
     - name: Commit and push chart
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # 환경 변수로 GitHub Token 사용
       run: |
         git add chart_files/chart.html  # chart.html 파일을 git에 추가
         git commit -m "Update chart"  # 커밋 메시지
-        git push https://${{ secrets.GH_TOKEN }}@github.com/Sanghoon-ai/bok-data-analysis.git HEAD:main  # PAT을 사용해 푸시
+        git push https://${{ secrets.GH_TOKEN }}@github.com/Sanghoon-ai/bok-data-analysis.git HEAD:main  # GITHUB_TOKEN을 사용해 푸시
