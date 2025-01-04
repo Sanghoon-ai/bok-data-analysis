@@ -60,7 +60,7 @@ try:
     
     # KOSPI 데이터
     fig.add_trace(
-        go.Scatter(x=kospi['datetime'], y=kospi['KOSPI_Close'], name="KOSPI"),
+        go.Scatter(x=kospi['datetime'], y=kospi['Close'], name="KOSPI"),
         secondary_y=True,
     )
     
