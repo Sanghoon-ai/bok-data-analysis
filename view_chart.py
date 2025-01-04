@@ -1,11 +1,12 @@
+import os
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 
 try:
-    # Your existing code here...
-    print("Starting to generate chart...")
+    # 작업 디렉토리 확인
+    print("현재 작업 디렉토리:", os.getcwd())
 
     # CSV 파일 읽기
     df1 = pd.read_csv('동행지수순환변동치.csv', parse_dates=['datetime'])
@@ -15,6 +16,19 @@ try:
     # KOSPI 데이터 CSV 파일 읽기
     kospi = pd.read_csv('KOSPI.csv', parse_dates=['Date'])
     kospi = kospi.rename(columns={'Date': 'datetime', 'Close': 'KOSPI_Close'})
+    
+    # CSV 파일 내용 확인
+    print("동행지수순환변동치.csv 내용:")
+    print(df1.head())
+    
+    print("선행지수순환변동치.csv 내용:")
+    print(df2.head())
+    
+    print("USD/KRW.csv 내용:")
+    print(df_usd_krw.head())
+    
+    print("KOSPI.csv 내용:")
+    print(kospi.head())
     
     # 그래프 그리기
     fig = make_subplots(
@@ -86,5 +100,7 @@ try:
     fig.write_html("chart.html")
     
     print("HTML 파일이 생성되었습니다. 'chart.html' 파일을 열어보세요.")
+    
 except Exception as e:
     print(f"Error occurred: {e}")
+
