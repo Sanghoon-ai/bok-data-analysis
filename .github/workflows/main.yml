@@ -7,6 +7,9 @@ on:
   schedule:      # 매일 실행
     - cron: '0 0 * * *'  # 매일 자정(UTC)에 실행
 
+permissions:
+  contents: write # Actions에 저장소 변경 권한 부여
+
 jobs:
   generate_csv:
     runs-on: ubuntu-latest
@@ -32,6 +35,7 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
+        git pull --rebase origin main
         git add 동행지수순환변동치.csv 선행지수순환변동치.csv
-        git commit -m "Update CSV files"
+        git diff --cached --quiet || git commit -m "Update CSV files" # 변경 사항이 있을 경우에만 커밋
         git push
