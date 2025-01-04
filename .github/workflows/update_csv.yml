@@ -25,17 +25,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests
+          pip install pandas requests yfinance
 
       - name: Run Python script
         run: |
-          python script.py
+          python script.py || exit 1  # 스크립트 실패 시 명시적으로 오류 처리
 
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub Token 설정
         run: |
-          git config --global user.name "GitHub Actions Bot"
+          git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git pull --rebase origin main
           git add *.csv
-          git commit -m "Update CSV files" || echo "No changes to commit"
+          git commit -m "Update CSV files"
           git push
