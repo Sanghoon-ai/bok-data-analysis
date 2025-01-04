@@ -28,7 +28,17 @@ jobs:
 
     - name: Run Python script to generate chart
       run: |
+        echo "Running view_chart.py..."
         python view_chart.py  # 차트 생성 스크립트 실행
+
+    - name: Check if chart.html exists
+      run: |
+        if [ -f chart.html ]; then
+          echo "chart.html exists."
+        else
+          echo "chart.html does not exist."
+          exit 1  # Exit if chart.html does not exist
+        fi
 
     - name: Configure Git for pushing
       run: |
@@ -41,6 +51,7 @@ jobs:
 
     - name: Commit and push chart
       run: |
+        echo "Adding and committing chart.html..."
         git add chart.html  # 차트 파일을 git에 추가
         git commit -m "Update chart"  # 커밋 메시지
         git push origin main  # 원격 저장소의 main 브랜치로 푸시
