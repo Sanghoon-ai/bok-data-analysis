@@ -43,4 +43,4 @@ jobs:
       run: |
         git add chart_files/chart.html  # chart.html 파일을 git에 추가
         git commit -m "Update chart"  # 커밋 메시지
-        git push origin main  # 원격 저장소의 main 브랜치로 푸시
+        git push https://${{ secrets.GITHUB_TOKEN }}@github.com/Sanghoon-ai/bok-data-analysis.git HEAD:main  # GITHUB_TOKEN을 사용해 푸시
