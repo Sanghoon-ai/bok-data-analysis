@@ -25,7 +25,7 @@ try:
     kospi.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
     
     # 'Date' 열을 datetime 형식으로 변환
-    kospi['Date'] = pd.to_datetime(kospi['Date'])
+    kospi['datetime'] = pd.to_datetime(kospi['Date'])
     
     # CSV 파일 내용 확인
     print("동행지수순환변동치.csv 내용:")
