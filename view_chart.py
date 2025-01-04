@@ -100,6 +100,8 @@ try:
         dragmode="zoom",
         spikedistance=-1,
     )
+
+    fig.show()
     
     # HTML 파일로 저장
     # 차트를 그려서 chart_files 폴더에 저장
