@@ -1,0 +1,37 @@
+name: Generate Chart
+
+on:
+  push:          # 저장소에 Push될 때 실행
+    branches:
+      - main     # main 브랜치에서만 실행
+  schedule:      # 매일 실행
+    - cron: '30 0 * * *'  # 매일 자정 30분(UTC)에 실행
+
+jobs:
+  generate_chart:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip install pandas requests plotly
+
+    - name: Run Python script to generate chart
+      run: |
+        python view_chart.py
+
+    - name: Commit and push chart
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add chart.html
+        git commit -m "Update chart"
+        git push
