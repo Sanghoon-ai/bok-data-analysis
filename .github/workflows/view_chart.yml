@@ -24,7 +24,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas requests plotly yfinance  # 필요한 의존성 설치
+        pip install os pandas requests plotly yfinance  # 필요한 의존성 설치
 
     - name: Run Python script to generate chart
       run: |
