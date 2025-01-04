@@ -1,0 +1,37 @@
+name: Generate CSV Files
+
+on:
+  push:          # 저장소에 Push될 때 실행
+    branches:
+      - main     # main 브랜치에서만 실행
+  schedule:      # 매일 실행
+    - cron: '0 0 * * *'  # 매일 자정(UTC)에 실행
+
+jobs:
+  generate_csv:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip install pandas requests
+
+    - name: Run Python script
+      run: |
+        python script.py
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add 동행지수순환변동치.csv 선행지수순환변동치.csv
+        git commit -m "Update CSV files"
+        git push
