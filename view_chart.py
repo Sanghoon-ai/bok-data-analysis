@@ -19,8 +19,13 @@ try:
     df_usd_krw = pd.read_csv('USD_KRW.csv', parse_dates=['datetime'])
     
     # KOSPI 데이터 CSV 파일 읽기
-    kospi = pd.read_csv('KOSPI.csv', parse_dates=['Date'])
-    kospi = kospi.rename(columns={'Date': 'datetime', 'Close': 'KOSPI_Close'})
+    kospi = pd.read_csv('KOSPI.csv', skiprows=3)  # 첫 세 줄을 건너뛰고 데이터 읽기
+    
+    # 열 이름 설정
+    kospi.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
+    
+    # 'Date' 열을 datetime 형식으로 변환
+    kospi['Date'] = pd.to_datetime(kospi['Date'])
     
     # CSV 파일 내용 확인
     print("동행지수순환변동치.csv 내용:")
