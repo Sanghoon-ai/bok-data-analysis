@@ -16,7 +16,7 @@ try:
     # CSV 파일 읽기
     df1 = pd.read_csv('동행지수순환변동치.csv', parse_dates=['datetime'])
     df2 = pd.read_csv('선행지수순환변동치.csv', parse_dates=['datetime'])
-    df_usd_krw = pd.read_csv('usd_krw.csv', parse_dates=['datetime'])
+    df_usd_krw = pd.read_csv('USD_KRW.csv', parse_dates=['datetime'])
     
     # KOSPI 데이터 CSV 파일 읽기
     kospi = pd.read_csv('KOSPI.csv', parse_dates=['Date'])
