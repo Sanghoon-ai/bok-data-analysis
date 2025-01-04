@@ -3,9 +3,9 @@ name: Generate Chart
 on:
   push:          # 저장소에 Push될 때 실행
     branches:
-      - main     # main 브랜치에서만 실행
+     - main     # main 브랜치에서만 실행
   schedule:      # 매일 실행
-    - cron: '30 0 * * *'  # 매일 자정 30분(UTC)에 실행
+     - cron: '30 0 * * *'  # 매일 자정 30분(UTC)에 실행
 
 jobs:
   generate_chart:
