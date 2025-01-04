@@ -37,11 +37,14 @@ jobs:
       run: |
         if [ -f "chart.html" ]; then echo "chart.html found"; else echo "chart.html not found"; fi
 
+    - name: Check git status
+      run: |
+        git status
+
     - name: Commit and push chart
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git status
         git add chart.html
-        git commit -m "Update chart"
+        git commit --allow-empty -m "Update chart"
         git push
