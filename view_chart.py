@@ -4,6 +4,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 
+# 폴더가 없으면 생성
+if not os.path.exists("chart_files"):
+    os.makedirs("chart_files")
+    
 try:
     # 작업 디렉토리 확인
     print("현재 작업 디렉토리:", os.getcwd())
@@ -97,9 +101,10 @@ try:
     )
     
     # HTML 파일로 저장
-    fig.write_html("chart.html")
+    # 차트를 그려서 chart_files 폴더에 저장
+    fig.write_html("chart_files/chart.html")
     
-    if os.path.exists("chart.html"):
+    if os.path.exists("chart_files/chart.html"):
         print("chart.html 파일이 정상적으로 생성되었습니다.")
         print("HTML 파일이 생성되었습니다. 'chart.html' 파일을 열어보세요.")
     else:
