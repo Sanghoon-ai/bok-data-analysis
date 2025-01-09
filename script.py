@@ -96,10 +96,8 @@ try:
         if not kospi.empty:
             # 'Date'와 모든 'Price' 컬럼을 제거한 데이터 만들기
             kospi_cleaned = kospi.reset_index(drop=True)  # 'Date'를 index에서 제거
-            kospi_cleaned = kospi_cleaned.iloc[:, 1:]  # 첫 번째 컬럼인 'Date'를 제외한 모든 컬럼 삭제
-            
             # 결과 출력
-            print(kospi_cleaned.iloc[3:])
+            print(kospi_cleaned)
         else:
             print("KOSPI 데이터가 비어 있습니다. 날짜 범위를 확인해주세요.")
         
