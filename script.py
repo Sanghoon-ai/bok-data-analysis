@@ -64,11 +64,11 @@ try:
     def get_latest_date_from_kospi(filename):
         try:
             # 필요한 행부터 데이터 읽기 (첫 두 줄 스킵)
-            df = pd.read_csv(filename, skiprows=2)  # 첫 두 줄 스킵
+            df = pd.read_csv(filename)  # 첫 두 줄 스킵
             df.columns = df.columns.str.strip()  # 열 이름에 공백 제거
             
             # 'Date' 열의 마지막 값 가져오기
-            last_date = df['Date'].iloc[-1]  # 가장 마지막 행의 'Date' 열 값
+            last_date = df[-1].iloc[-1]  # 가장 마지막 행의 'Date' 열 값
             
             # 문자열 날짜를 datetime 객체로 변환 후 하루 더하기
             latest_date = (datetime.strptime(last_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
