@@ -13,6 +13,10 @@ try:
     # 작업 디렉토리 확인
     print("현재 작업 디렉토리:", os.getcwd())
 
+    # KOSPI.csv 파일에서 마지막 줄의 첫 번째 열(날짜) 가져오기
+    kospi_df = pd.read_csv('KOSPI.csv')
+    last_date = kospi_df.iloc[-1, 0]  # 마지막 줄의 첫 번째 열 값
+
     # CSV 파일 읽기
     df1 = pd.read_csv('동행지수순환변동치.csv', parse_dates=['datetime'])
     df2 = pd.read_csv('선행지수순환변동치.csv', parse_dates=['datetime'])
@@ -72,7 +76,7 @@ try:
     
     # 레이아웃 업데이트
     fig.update_layout(
-        title_text='선행지수변동치와 동행지수변동치, KOSPI, USD/KRW',
+        title_text='선행지수변동치와 동행지수변동치, KOSPI, USD/KRW ({last_date})',
         title={'x': 0.5, 'y': 0.9},  # 중앙 정렬
         xaxis=dict(
             title='날짜',
