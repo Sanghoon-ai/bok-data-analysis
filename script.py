@@ -60,8 +60,9 @@ try:
     # KOSPI.csv 파일에서 마지막 날짜 가져오기
     def get_latest_date_from_kospi(filename):
         try:
-            # CSV 파일 읽기
-            df = pd.read_csv(filename)
+            # 필요한 행부터 데이터 읽기 (첫 두 줄 스킵)
+            df = pd.read_csv(filename, skiprows=2)  # 첫 두 줄 스킵
+            df.columns = df.columns.str.strip()  # 열 이름에 공백 제거
             
             # 'Date' 열의 마지막 값 가져오기
             last_date = df['Date'].iloc[-1]  # 가장 마지막 행의 'Date' 열 값
@@ -72,6 +73,9 @@ try:
             return latest_date
         except FileNotFoundError:
             # 파일이 없으면 기본 시작 날짜 반환
+            return '1990-01-01'
+        except Exception as e:
+            print(f"Error processing KOSPI.csv: {e}")
             return '1990-01-01'
         
     # KOSPI 데이터 가져오기 및 CSV 저장
