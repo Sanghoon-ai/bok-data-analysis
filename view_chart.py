@@ -105,7 +105,7 @@ try:
     
     # 레이아웃 업데이트
     fig.update_layout(
-        title_text='선행지수변동치와 동행지수변동치, KOSPI, USD/KRW ({last_date})',
+        title_text=f'선행지수변동치와 동행지수변동치, KOSPI, USD/KRW ({last_date})',
         title={'x': 0.5, 'y': 0.9},  # 중앙 정렬
         xaxis=dict(
             title='날짜',
