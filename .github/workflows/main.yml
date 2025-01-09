@@ -42,6 +42,36 @@ jobs:
             echo "KOSPI.csv 파일이 존재하지 않습니다."
           fi
 
+      - name: Remove USD_KRW.csv file
+        run: |
+          if [ -f "USD_KRW.csv" ]; then
+            git rm USD_KRW.csv  # USD_KRW.csv 파일 삭제
+            git commit -m "Remove USD_KRW.csv file"  # 파일 삭제 커밋
+            git push  # 변경 사항 푸시
+          else
+            echo "USD_KRW.csv 파일이 존재하지 않습니다."
+          fi
+     
+      - name: Remove 동행지수순환변동치.csv file
+        run: |
+          if [ -f "동행지수순환변동치.csv" ]; then
+            git rm 동행지수순환변동치.csv  # 동행지수순환변동치.csv 파일 삭제
+            git commit -m "Remove 동행지수순환변동치.csv file"  # 파일 삭제 커밋
+            git push  # 변경 사항 푸시
+          else
+            echo "동행지수순환변동치.csv 파일이 존재하지 않습니다."
+          fi
+      
+      - name: Remove 선행지수순환변동치.csv file
+        run: |
+          if [ -f "선행지수순환변동치.csv" ]; then
+            git rm 선행지수순환변동치.csv  # 선행지수순환변동치.csv 파일 삭제
+            git commit -m "Remove 선행지수순환변동치.csv file"  # 파일 삭제 커밋
+            git push  # 변경 사항 푸시
+          else
+            echo "선행지수순환변동치.csv 파일이 존재하지 않습니다."
+          fi
+          
       - name: Run Python script
         run: |
           python script.py || exit 1  # 스크립트 실패 시 명시적으로 오류 처리
