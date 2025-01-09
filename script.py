@@ -94,7 +94,8 @@ try:
 
         # 3번째 인덱스 이후의 데이터 필터링
         kospi_cleaned = kospi[3:]
-    
+        print(kospi_cleaned)  
+        
         # 기존 CSV 파일 읽기
         try:
             # 기존 CSV 파일이 존재하는지 확인 
@@ -109,7 +110,13 @@ try:
                     # 인덱스를 날짜로 변환하고, 각 데이터만 추가
                     row_data = [row.name.strftime('%Y-%m-%d')] + list(row)  # 날짜 + 값들
                     writer.writerow(row_data)
-        
+
+            # CSV 파일 읽기
+            df_kospi = pd.read_csv('KOSPI.csv')
+            
+            # 마지막 몇 줄 출력
+            print(df_kospi.tail())  # 최근 데이터 확인
+
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
             kospi[3:].to_csv('KOSPI.csv', mode='w', header=False, index=False, encoding='utf-8-sig')
