@@ -87,18 +87,25 @@ try:
     print("latest_kospi_date : ", latest_kospi_date, "enddate_kospi :", enddate_kospi)
     
     try:
+        # KOSPI 데이터 다운로드
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
-        print(kospi)
-        # 기존 CSV 파일이 존재하면, 파일을 읽어서 헤더를 처리한 후 새로운 데이터 추가
+        print(kospi)  # 다운로드한 데이터 출력
+    
+        # 기존 CSV 파일 읽기
         try:
             existing_df = pd.read_csv('KOSPI.csv')
-            # 기존 데이터가 있으면 첫 번째 행을 건너뛰고 추가 (헤더를 덮어쓰지 않음)
-            # 'Ticker' 행을 제거 (DataFrame에서 첫 번째 행을 삭제)
-            kospi_cleaned = kospi.iloc[3:]
-            kospi_cleaned.to_csv('KOSPI.csv', mode='a', header=False, index=False, encoding='utf-8-sig')
+            # 기존 데이터와 새로운 데이터를 합침
+            kospi_cleaned = kospi.reset_index()  # Date를 컬럼으로 만들어줍니다.
+            combined_df = pd.concat([existing_df, kospi_cleaned], ignore_index=True)
+            
+            # 다시 저장, header는 이미 존재하므로 False로 설정
+            combined_df.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
+        
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
-            kospi.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
+            kospi_cleaned = kospi.reset_index()  # Date를 컬럼으로 만들어줍니다.
+            kospi_cleaned.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
+    
     except Exception as e:
         print("Error downloading KOSPI data:", e)
     
