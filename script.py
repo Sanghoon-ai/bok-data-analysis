@@ -92,9 +92,13 @@ try:
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
 
-        # 3번째 인덱스 이후의 데이터 필터링
-        kospi_cleaned = kospi,iloc[3:]
-        print(kospi_cleaned)  
+        # 데이터가 DataFrame 형식인지 확인
+        if isinstance(kospi, pd.DataFrame):
+            # 3번째 인덱스 이후의 데이터 필터링
+            kospi_cleaned = kospi.iloc[3:]  # iloc을 사용해 행을 선택
+            print(kospi_cleaned)
+        else:
+            print("kospi 데이터가 올바른 DataFrame 형식이 아닙니다.")
         
         # 기존 CSV 파일 읽기
         try:
