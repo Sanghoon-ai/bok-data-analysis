@@ -26,32 +26,31 @@ jobs:
       run: |
         pip install pandas requests plotly yfinance  # 필요한 의존성 설치
 
-    - name: Remove old chart file
-      run: |
-        if [ -f "chart_files/chart.html" ]; then
-          git rm -f chart_files/chart.html  # 기존 chart.html 파일 강제 삭제
-          echo "chart_files/chart.html has been removed."
-        else
-          echo "chart_files/chart.html does not exist."
-        fi
-
-    - name: Run Python script to generate chart
-      run: |
-        python view_chart.py  # 차트 생성 스크립트 실행
-
     - name: Configure Git for pushing
       run: |
         git config --global user.name "GitHub Actions"  # GitHub Actions 사용자명 설정
         git config --global user.email "actions@github.com"  # GitHub Actions 이메일 설정
 
-    - name: Pull latest changes
+    - name: Remove existing chart.html
       run: |
-        git pull origin main --rebase  # 원격 저장소에서 최신 변경 사항을 로컬에 병합 (리베이스)
+        if [ -f "chart_files/chart.html" ]; then
+          git rm -f chart_files/chart.html  # 강제로 chart.html 파일 삭제
+          git commit -m "Remove existing chart_files/chart.html file" || echo "No changes to commit"  # 변경 사항이 있으면 커밋
+        else
+          echo "chart.html 파일이 존재하지 않습니다."
 
-    - name: Commit and push changes
+    - name: Run Python script to generate chart
+      run: |
+        python view_chart.py  # 차트 생성 스크립트 실행
+
+    - name: Commit new chart
+      run: |
+        git add chart_files/chart.html  # 새로 생성된 chart.html 파일 추가
+        git commit -m "Update chart_files/chart.html file" || echo "No changes to commit"  # 변경 사항이 있으면 커밋
+
+    - name: Pull latest changes and push updates
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # 환경 변수로 GitHub Token 사용
       run: |
-        git add chart_files/chart.html  # chart.html 파일 추가
-        git commit -m "Update chart_files/chart.html file" || echo "No changes to commit"  # 변경 사항이 없으면 메시지 출력
-        git push https://${{ secrets.GH_TOKEN }}@github.com/Sanghoon-ai/bok-data-analysis.git HEAD:main  # GITHUB_TOKEN을 사용해 푸시
+        git pull origin main --rebase  # 원격 저장소의 최신 변경 사항 병합
+        git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # 변경 사항 푸시
