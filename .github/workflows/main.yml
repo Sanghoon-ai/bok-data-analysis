@@ -11,7 +11,7 @@ permissions:
   contents: write  # 저장소 변경 권한 부여
 
 jobs:
-  run-script:
+  update-csv:
     runs-on: ubuntu-22.04
 
     steps:
@@ -32,54 +32,28 @@ jobs:
           git config --global user.email "your-email@example.com"  # Git 이메일 설정
           git config --global user.name "Your Name"  # Git 사용자 이름 설정
 
-      - name: Remove KOSPI.csv file
+      - name: Remove outdated CSV files
         run: |
-          if [ -f "KOSPI.csv" ]; then
-            git rm KOSPI.csv  # KOSPI.csv 파일 삭제
-            git commit -m "Remove KOSPI.csv file"  # 파일 삭제 커밋
-            git push  # 변경 사항 푸시
-          else
-            echo "KOSPI.csv 파일이 존재하지 않습니다."
-          fi
+          files_to_remove=("KOSPI.csv" "USD_KRW.csv" "동행지수순환변동치.csv" "선행지수순환변동치.csv")
+          for file in "${files_to_remove[@]}"; do
+            if [ -f "$file" ]; then
+              git rm "$file"  # 파일 삭제
+              echo "$file removed."
+            else
+              echo "$file does not exist."
+            fi
+          done
+          git commit -m "Remove outdated CSV files" || echo "No files to remove"  # 변경 사항 없으면 메시지 출력
 
-      - name: Remove USD_KRW.csv file
-        run: |
-          if [ -f "USD_KRW.csv" ]; then
-            git rm USD_KRW.csv  # USD_KRW.csv 파일 삭제
-            git commit -m "Remove USD_KRW.csv file"  # 파일 삭제 커밋
-            git push  # 변경 사항 푸시
-          else
-            echo "USD_KRW.csv 파일이 존재하지 않습니다."
-          fi
-     
-      - name: Remove 동행지수순환변동치.csv file
-        run: |
-          if [ -f "동행지수순환변동치.csv" ]; then
-            git rm 동행지수순환변동치.csv  # 동행지수순환변동치.csv 파일 삭제
-            git commit -m "Remove 동행지수순환변동치.csv file"  # 파일 삭제 커밋
-            git push  # 변경 사항 푸시
-          else
-            echo "동행지수순환변동치.csv 파일이 존재하지 않습니다."
-          fi
-      
-      - name: Remove 선행지수순환변동치.csv file
-        run: |
-          if [ -f "선행지수순환변동치.csv" ]; then
-            git rm 선행지수순환변동치.csv  # 선행지수순환변동치.csv 파일 삭제
-            git commit -m "Remove 선행지수순환변동치.csv file"  # 파일 삭제 커밋
-            git push  # 변경 사항 푸시
-          else
-            echo "선행지수순환변동치.csv 파일이 존재하지 않습니다."
-          fi
-          
       - name: Run Python script
         run: |
           python script.py || exit 1  # 스크립트 실패 시 명시적으로 오류 처리
 
-      - name: Check for changes and commit
+      - name: Add and commit new CSV files
         run: |
-          git status  # 파일 상태 확인
-          git add $(find . -name "*.csv")  # 모든 CSV 파일을 추가
-          git status  # 변경된 파일 확인
-          git commit -m "Update CSV files" || echo "No changes to commit"  # 변경된 파일이 없으면 메시지 출력
-          git push
+          git add $(find . -name "*.csv")  # 모든 CSV 파일 추가
+          git commit -m "Update CSV files" || echo "No changes to commit"  # 변경 사항 없으면 메시지 출력
+
+      - name: Push changes
+        run: |
+          git push || echo "Nothing to push"  # 변경 사항이 없을 경우 메시지 출력
