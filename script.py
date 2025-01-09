@@ -108,7 +108,7 @@ try:
                 print("KOSPI.csv 파일이 삭제되었습니다.")
             
             # 다시 저장, header는 이미 존재하므로 False로 설정
-            combined_df.to_csv('KOSPI.csv', mode='w', header=False index=False, encoding='utf-8-sig')
+            combined_df.to_csv('KOSPI.csv', mode='w', header=False, index=False, encoding='utf-8-sig')
         
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
