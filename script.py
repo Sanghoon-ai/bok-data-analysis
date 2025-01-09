@@ -97,7 +97,7 @@ try:
     
         # 기존 CSV 파일 읽기
         try:
-            # 기존 CSV 파일이 존재하는지 확인
+            # 기존 CSV 파일이 존재하는지 확인 
             file_exists = os.path.exists('KOSPI.csv')
         
             # 기존 CSV 파일 읽기 및 새 데이터 추가
