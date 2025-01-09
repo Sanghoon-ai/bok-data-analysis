@@ -84,7 +84,8 @@ try:
     # KOSPI 데이터 가져오기 및 CSV 저장
     enddate_kospi = datetime.now().strftime('%Y-%m-%d')
     latest_kospi_date = get_latest_date_from_kospi('KOSPI.csv')
-
+    print("latest_kospi_date : ", latest_kospi_date, "enddate_kospi :", enddate_kospi)
+    
     try:
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
         kospi.to_csv('KOSPI.csv', mode='a', header=False, encoding='utf-8-sig')
