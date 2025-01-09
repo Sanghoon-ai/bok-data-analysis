@@ -94,8 +94,10 @@ try:
 
         # 데이터가 비어있지 않다면
         if not kospi.empty:
-            # 컬럼명을 제거하고, 데이터만 남기기
-            kospi_cleaned = kospi.values  # 데이터만 남기기 (컬럼명 제거)
+            # 'Date'를 인덱스로 두고, 컬럼명만 제거
+            kospi_cleaned = kospi.reset_index(drop=False)  # 'Date' 컬럼을 인덱스로 유지
+            kospi_cleaned.columns = [''] * len(kospi_cleaned.columns)  # 모든 컬럼명을 빈 문자열로 설정
+        
             # 결과 출력
             print(kospi_cleaned)
         else:
