@@ -8,7 +8,26 @@ from datetime import datetime
 output_dir = os.path.join(os.getcwd(), "chart_files")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
-    
+
+# 필요한 파일 목록
+required_files = [
+    "KOSPI.csv",
+    "동행지수순환변동치.csv",
+    "선행지수순환변동치.csv",
+    "USD_KRW.csv"
+]
+
+# 파일 존재 여부를 확인하고, 없으면 대기
+while True:
+    missing_files = [file for file in required_files if not os.path.exists(file)]
+    if not missing_files:
+        print("모든 파일이 존재합니다.")
+        break
+    else:
+        print(f"다음 파일이 존재하지 않습니다: {missing_files}")
+        print("5초 후 다시 확인합니다...")
+        time.sleep(5)
+        
 try:
     # 작업 디렉토리 확인
     print("현재 작업 디렉토리:", os.getcwd())
