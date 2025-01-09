@@ -80,7 +80,7 @@ try:
 
     try:
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
-       kospi.to_csv('KOSPI.csv', mode='a', header=False, encoding='utf-8-sig')
+        kospi.to_csv('KOSPI.csv', mode='a', header=False, encoding='utf-8-sig')
     except Exception as e:
         print("Error downloading KOSPI data:", e)
     
