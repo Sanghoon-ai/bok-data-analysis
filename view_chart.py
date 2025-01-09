@@ -37,10 +37,20 @@ try:
     last_date = kospi_df.iloc[-1, 0]  # 마지막 줄의 첫 번째 열 값
 
     # CSV 파일 읽기
-    df1 = pd.read_csv('동행지수순환변동치.csv', parse_dates=['datetime'])
-    df2 = pd.read_csv('선행지수순환변동치.csv', parse_dates=['datetime'])
-    df_usd_krw = pd.read_csv('USD_KRW.csv', parse_dates=['datetime'])
+    df1 = pd.read_csv('동행지수순환변동치.csv')  # 첫 번째 열에 날짜 포함된 파일
+    df2 = pd.read_csv('선행지수순환변동치.csv')  # 첫 번째 열에 날짜 포함된 파일
+    df_usd_krw = pd.read_csv('USD_KRW.csv')  # 첫 번째 열에 날짜 포함된 파일
     
+    # 첫 번째 열을 datetime 형식으로 변환
+    df1.iloc[:, 0] = pd.to_datetime(df1.iloc[:, 0])  # 첫 번째 열을 datetime으로 변환
+    df2.iloc[:, 0] = pd.to_datetime(df2.iloc[:, 0])  # 첫 번째 열을 datetime으로 변환
+    df_usd_krw.iloc[:, 0] = pd.to_datetime(df_usd_krw.iloc[:, 0])  # 첫 번째 열을 datetime으로 변환
+
+    # 두 번째 열 이름을 'DATA_VALUE'로 변경
+    df1.columns = ['datetime', 'DATA_VALUE']  # 두 번째 열을 'DATA_VALUE'로 변경
+    df2.columns = ['datetime', 'DATA_VALUE']  # 두 번째 열을 'DATA_VALUE'로 변경
+    df_usd_krw.columns = ['datetime', 'DATA_VALUE']  # 두 번째 열을 'DATA_VALUE'로 변경
+
     # KOSPI 데이터 CSV 파일 읽기
     kospi = pd.read_csv('KOSPI.csv', skiprows=3)  # 첫 세 줄을 건너뛰고 데이터 읽기
     
