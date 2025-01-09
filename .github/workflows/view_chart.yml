@@ -38,6 +38,7 @@ jobs:
           git commit -m "Remove existing chart_files/chart.html file" || echo "No changes to commit"  # 변경 사항이 있으면 커밋
         else
           echo "chart.html 파일이 존재하지 않습니다."
+        fi
 
     - name: Run Python script to generate chart
       run: |
