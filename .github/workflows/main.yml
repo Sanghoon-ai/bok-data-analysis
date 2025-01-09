@@ -27,6 +27,16 @@ jobs:
         run: |
           pip install pandas requests yfinance
 
+      - name: Remove KOSPI.csv file
+        run: |
+          if [ -f "KOSPI.csv" ]; then
+            git rm KOSPI.csv  # KOSPI.csv 파일 삭제
+            git commit -m "Remove KOSPI.csv file"  # 파일 삭제 커밋
+            git push  # 변경 사항 푸시
+          else
+            echo "KOSPI.csv 파일이 존재하지 않습니다."
+          fi
+
       - name: Run Python script
         run: |
           python script.py || exit 1  # 스크립트 실패 시 명시적으로 오류 처리
