@@ -68,7 +68,7 @@ try:
             df.columns = df.columns.str.strip()  # 열 이름에 공백 제거
             
             # 'Date' 열의 마지막 값 가져오기
-            last_date = df[-1].iloc[-1]  # 가장 마지막 행의 'Date' 열 값
+            last_date = df.iloc[-1, 0]  # 가장 마지막 행의 'Date' 열 값
             
             # 문자열 날짜를 datetime 객체로 변환 후 하루 더하기
             latest_date = (datetime.strptime(last_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -101,8 +101,14 @@ try:
             # 기존 데이터와 새로운 데이터를 합침
             combined_df = pd.concat([existing_df, kospi_cleaned], ignore_index=True)
             print(combined_df)
+            
+             # 기존 KOSPI.csv 파일 삭제
+            if os.path.exists('KOSPI.csv'):
+                os.remove('KOSPI.csv')
+                print("KOSPI.csv 파일이 삭제되었습니다.")
+            
             # 다시 저장, header는 이미 존재하므로 False로 설정
-            combined_df.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
+            combined_df.to_csv('KOSPI.csv', mode='w', header=False index=False, encoding='utf-8-sig')
         
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
