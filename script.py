@@ -103,7 +103,7 @@ try:
     
             # 기존 데이터와 새로운 데이터를 합침
             combined_df = pd.concat([existing_df, kospi_cleaned], ignore_index=True)
-    
+            print(combined_df)
             # 다시 저장, header는 이미 존재하므로 False로 설정
             combined_df.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
         
