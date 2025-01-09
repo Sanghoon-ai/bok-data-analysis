@@ -61,78 +61,28 @@ try:
     df1[['datetime', 'DATA_VALUE']].to_csv('동행지수순환변동치.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
     df2[['datetime', 'DATA_VALUE']].to_csv('선행지수순환변동치.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
 
-    # KOSPI.csv 파일에서 마지막 날짜 가져오기
-    def get_latest_date_from_kospi(filename):
-        try:
-            # 필요한 행부터 데이터 읽기 (첫 두 줄 스킵)
-            df = pd.read_csv(filename)  # 첫 두 줄 스킵
-            df.columns = df.columns.str.strip()  # 열 이름에 공백 제거
-            
-            # 'Date' 열의 마지막 값 가져오기
-            last_date = df.iloc[-1, 0]  # 가장 마지막 행의 'Date' 열 값
-            
-            # 문자열 날짜를 datetime 객체로 변환 후 하루 더하기
-            latest_date = (datetime.strptime(last_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
-            
-            return latest_date
-        except FileNotFoundError:
-            # 파일이 없으면 기본 시작 날짜 반환
-            return '1990-01-01'
-        except Exception as e:
-            print(f"Error processing KOSPI.csv: {e}")
-            return '1990-01-01'
-        
-    # KOSPI 데이터 가져오기 및 CSV 저장
-    enddate_kospi = datetime.now().strftime('%Y-%m-%d')
-    latest_kospi_date = get_latest_date_from_kospi('KOSPI.csv')
-    print("latest_kospi_date : ", latest_kospi_date, "enddate_kospi :", enddate_kospi)
+    # 날짜 설정 (datetime 객체로 설정)
+    enddate_kospi = pd.to_datetime('today')  # 오늘 날짜
+    
+    # KOSPI.csv 파일 삭제
+    if os.path.exists('KOSPI.csv'):
+        os.remove('KOSPI.csv')  # 기존 KOSPI.csv 파일 삭제
     
     try:
         # KOSPI 데이터 다운로드
-        kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
+        kospi = yf.download('^KS11', start='1996-01-01', end=enddate_kospi, auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
-
+    
         # 데이터가 비어있지 않다면
         if not kospi.empty:
-            # 'Date'를 인덱스로 두고, 컬럼명만 제거
-            kospi_cleaned = kospi.reset_index(drop=False)  # 'Date' 컬럼을 인덱스로 유지
-            kospi_cleaned.columns = [''] * len(kospi_cleaned.columns)  # 모든 컬럼명을 빈 문자열로 설정
-            # 첫 번째 열 (인덱스 열)을 삭제
-            kospi_cleaned = kospi_cleaned.drop(kospi_cleaned.columns[0], axis=1)  # 첫 번째 열 제거
-        
-            # 결과 출력
-            print(kospi_cleaned)
+            # CSV 파일로 저장 (헤더 포함, 인덱스 제외)
+            kospi.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
+            print("KOSPI 데이터를 KOSPI.csv에 저장했습니다.")
         else:
             print("KOSPI 데이터가 비어 있습니다. 날짜 범위를 확인해주세요.")
-        
-        # 기존 CSV 파일 읽기
-        try:
-            # 기존 CSV 파일이 존재하는지 확인 
-            file_exists = os.path.exists('KOSPI.csv')
-        
-            # 기존 CSV 파일 읽기 및 새 데이터 추가
-            with open('KOSPI.csv', mode='a', newline='', encoding='utf-8-sig') as file:
-                writer = csv.writer(file)
-
-                # 새 데이터 추가 (각 행을 바로 추가)
-                for index, row in kospi_cleaned.iterrows():
-                    # 인덱스를 날짜로 변환하고, 각 데이터만 추가
-                    date_str = pd.to_datetime(row.name).strftime('%Y-%m-%d')  # 날짜를 문자열로 변환
-                    row_data = [date_str] + list(row)  # 날짜 + 값들
-                    writer.writerow(row_data)
-
-            # CSV 파일 읽기
-            df_kospi = pd.read_csv('KOSPI.csv')
-            
-            # 마지막 몇 줄 출력
-            print(df_kospi.tail())  # 최근 데이터 확인
-
-        except FileNotFoundError:
-            # 파일이 없으면 헤더와 함께 저장
-            kospi.to_csv('KOSPI.csv', mode='w', header=False, index=False, encoding='utf-8-sig')
     
     except Exception as e:
-        print("Error downloading KOSPI data:", e)
+        print(f"Error downloading KOSPI data: {e}")
     
     # USD/KRW 환율 데이터 가져오기 (한국은행 API에서 FXX001으로 가져오기)
     startdate_usdkrw = get_latest_date_from_csv('USD_KRW.csv', 'datetime')
