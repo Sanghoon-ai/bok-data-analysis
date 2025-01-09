@@ -90,20 +90,27 @@ try:
         # KOSPI 데이터 다운로드
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
-    
+
         # 기존 CSV 파일 읽기
         try:
             existing_df = pd.read_csv('KOSPI.csv')
+    
+            # 새로운 데이터에 대해 'Ticker' 열을 추가하고, 'Date'를 인덱스에서 컬럼으로 이동
+            kospi_cleaned = kospi.reset_index()  # 'Date'가 인덱스로 되어 있기 때문에 컬럼으로 변환
+    
+            # Ticker 열을 추가 (모든 행에 동일한 Ticker 값을 넣기)
+            kospi_cleaned['Ticker'] = '^KS11'
+    
             # 기존 데이터와 새로운 데이터를 합침
-            kospi_cleaned = kospi.reset_index()  # Date를 컬럼으로 만들어줍니다.
             combined_df = pd.concat([existing_df, kospi_cleaned], ignore_index=True)
-            
+    
             # 다시 저장, header는 이미 존재하므로 False로 설정
             combined_df.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
         
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
-            kospi_cleaned = kospi.reset_index()  # Date를 컬럼으로 만들어줍니다.
+            kospi_cleaned = kospi.reset_index()  # 'Date'를 컬럼으로 만들어줍니다.
+            kospi_cleaned['Ticker'] = '^KS11'
             kospi_cleaned.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
     
     except Exception as e:
