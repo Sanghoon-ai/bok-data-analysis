@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "10 0 * * *"  # 매일자정 10분에 실행 (UTC)
+    - cron: "10 0 * * *"  # 매일 자정 10분에 실행 (UTC)
 
 permissions:
   contents: write  # 저장소 변경 권한 부여
@@ -30,7 +30,7 @@ jobs:
             fi
           done
           git commit -m "Remove outdated CSV files" || echo "No files to remove"  # 변경 사항 없으면 메시지 출력
-          
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -57,3 +57,8 @@ jobs:
       - name: Push changes
         run: |
           git push || echo "Nothing to push"  # 변경 사항이 없을 경우 메시지 출력
+
+      - name: Trigger view_chart.yml workflow
+        run: |
+          echo "Triggering view_chart.yml workflow after main.yml finishes"
+          gh workflow run view_chart.yml  # GitHub CLI를 사용하여 view_chart.yml 실행
