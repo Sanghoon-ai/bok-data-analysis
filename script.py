@@ -52,6 +52,9 @@ try:
     # 데이터 분리
     df1 = df.loc[df['ITEM_NAME1'] == '동행지수순환변동치']
     df2 = df.loc[df['ITEM_NAME1'] == '선행지수순환변동치']
+
+    print(df1)
+    print(df2)
     
     # CSV 파일 저장
     df1[['datetime', 'DATA_VALUE']].to_csv('동행지수순환변동치.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
