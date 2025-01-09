@@ -94,8 +94,8 @@ try:
 
         # 데이터가 비어있지 않다면
         if not kospi.empty:
-            # 'Date'와 모든 'Price' 컬럼을 제거한 데이터 만들기
-            kospi_cleaned = kospi.reset_index(drop=True)  # 'Date'를 index에서 제거
+            # 컬럼명을 제거하고, 데이터만 남기기
+            kospi_cleaned = kospi.values  # 데이터만 남기기 (컬럼명 제거)
             # 결과 출력
             print(kospi_cleaned)
         else:
