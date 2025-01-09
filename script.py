@@ -92,13 +92,16 @@ try:
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
 
-        # 데이터가 DataFrame 형식인지 확인
-        if isinstance(kospi, pd.DataFrame):
-            # 3번째 인덱스 이후의 데이터 필터링
-            kospi_cleaned = kospi.iloc[3:]  # iloc을 사용해 행을 선택
-            print(kospi_cleaned)
+        # 데이터가 비어있지 않다면
+        if not kospi.empty:
+            # 'Date'와 모든 'Price' 컬럼을 제거한 데이터 만들기
+            kospi_cleaned = kospi.reset_index(drop=True)  # 'Date'를 index에서 제거
+            kospi_cleaned = kospi_cleaned.iloc[:, 1:]  # 첫 번째 컬럼인 'Date'를 제외한 모든 컬럼 삭제
+            
+            # 결과 출력
+            print(kospi_cleaned.iloc[3:])
         else:
-            print("kospi 데이터가 올바른 DataFrame 형식이 아닙니다.")
+            print("KOSPI 데이터가 비어 있습니다. 날짜 범위를 확인해주세요.")
         
         # 기존 CSV 파일 읽기
         try:
