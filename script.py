@@ -115,7 +115,8 @@ try:
                 # 새 데이터 추가 (각 행을 바로 추가)
                 for index, row in kospi_cleaned.iterrows():
                     # 인덱스를 날짜로 변환하고, 각 데이터만 추가
-                    row_data = [row.name.strftime('%Y-%m-%d')] + list(row)  # 날짜 + 값들
+                    date_str = pd.to_datetime(row.name).strftime('%Y-%m-%d')  # 날짜를 문자열로 변환
+                    row_data = [date_str] + list(row)  # 날짜 + 값들
                     writer.writerow(row_data)
 
             # CSV 파일 읽기
