@@ -63,4 +63,4 @@ jobs:
           echo "Triggering view_chart.yml workflow after main.yml finishes"
           gh workflow run view_chart.yml  # GitHub CLI를 사용하여 view_chart.yml 실행
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GH_TOKEN 환경 변수 설정
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 환경 변수로 토큰을 전달
