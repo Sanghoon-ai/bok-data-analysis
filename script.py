@@ -93,7 +93,7 @@ try:
         print(kospi)  # 다운로드한 데이터 출력
 
         # 3번째 인덱스 이후의 데이터 필터링
-        kospi_cleaned = kospi[3:]
+        kospi_cleaned = kospi,iloc[3:]
         print(kospi_cleaned)  
         
         # 기존 CSV 파일 읽기
@@ -119,7 +119,7 @@ try:
 
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
-            kospi[3:].to_csv('KOSPI.csv', mode='w', header=False, index=False, encoding='utf-8-sig')
+            kospi.to_csv('KOSPI.csv', mode='w', header=False, index=False, encoding='utf-8-sig')
     
     except Exception as e:
         print("Error downloading KOSPI data:", e)
