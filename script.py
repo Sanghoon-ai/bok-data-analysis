@@ -1,3 +1,4 @@
+import csv, os
 import requests
 import pandas as pd
 import yfinance as yf
@@ -91,24 +92,23 @@ try:
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
 
+        # 3번째 인덱스 이후의 데이터 필터링
+        kospi_cleaned = kospi[3:]
+    
         # 기존 CSV 파일 읽기
         try:
-            existing_df = pd.read_csv('KOSPI.csv')
-    
-            # 새로운 데이터에 대해 'Ticker' 열을 추가하고, 'Date'를 인덱스에서 컬럼으로 이동
-            kospi_cleaned = kospi[3:]
-    
-            # 기존 데이터와 새로운 데이터를 합침
-            combined_df = pd.concat([existing_df, kospi_cleaned], ignore_index=True)
-            print(combined_df)
-            
-             # 기존 KOSPI.csv 파일 삭제
-            if os.path.exists('KOSPI.csv'):
-                os.remove('KOSPI.csv')
-                print("KOSPI.csv 파일이 삭제되었습니다.")
-            
-            # 다시 저장, header는 이미 존재하므로 False로 설정
-            combined_df.to_csv('KOSPI.csv', mode='w', header=False, index=False, encoding='utf-8-sig')
+            # 기존 CSV 파일이 존재하는지 확인
+            file_exists = os.path.exists('KOSPI.csv')
+        
+            # 기존 CSV 파일 읽기 및 새 데이터 추가
+            with open('KOSPI.csv', mode='a', newline='', encoding='utf-8-sig') as file:
+                writer = csv.writer(file)
+
+                # 새 데이터 추가 (각 행을 바로 추가)
+                for index, row in kospi_cleaned.iterrows():
+                    # 인덱스를 날짜로 변환하고, 각 데이터만 추가
+                    row_data = [row.name.strftime('%Y-%m-%d')] + list(row)  # 날짜 + 값들
+                    writer.writerow(row_data)
         
         except FileNotFoundError:
             # 파일이 없으면 헤더와 함께 저장
