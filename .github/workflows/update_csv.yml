@@ -34,7 +34,7 @@ jobs:
       - name: Check for changes and commit
         run: |
           git status  # 파일 상태 확인
-          git add **/*.csv  # 모든 CSV 파일을 추가
+          git add $(find . -name "*.csv")  # 모든 CSV 파일을 추가
           git status  # 변경된 파일 확인
           git commit -m "Update CSV files" || echo "No changes to commit"  # 변경된 파일이 없으면 메시지 출력
           git push
