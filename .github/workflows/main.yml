@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 12 * * *"  # 매일 12시에 실행 (UTC)
+    - cron: "10 0 * * *"  # 매일자정 10분에 실행 (UTC)
 
 permissions:
   contents: write  # 저장소 변경 권한 부여
