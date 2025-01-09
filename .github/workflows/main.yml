@@ -31,11 +31,10 @@ jobs:
       run: |
         python script.py || exit 1  # 스크립트 실패 시 명시적으로 오류 처리
 
-    - name: Commit and push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub Token 설정
+    - name: Check for changes and commit
       run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-        git add *.csv
-        git commit -m "Update CSV files"
+        git status  # 파일 상태 확인
+        git add **/*.csv  # 모든 CSV 파일을 추가
+        git status  # 변경된 파일 확인
+        git commit -m "Update CSV files" || echo "No changes to commit"  # 변경된 파일이 없으면 메시지 출력
+        git push
