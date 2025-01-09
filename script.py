@@ -64,10 +64,6 @@ try:
     # 날짜 설정 (datetime 객체로 설정)
     enddate_kospi = pd.to_datetime('today')  # 오늘 날짜
     
-    # KOSPI.csv 파일 삭제
-    if os.path.exists('KOSPI.csv'):
-        os.remove('KOSPI.csv')  # 기존 KOSPI.csv 파일 삭제
-    
     try:
         # KOSPI 데이터 다운로드
         kospi = yf.download('^KS11', start='1996-01-01', end=enddate_kospi, auto_adjust=True)
@@ -76,7 +72,7 @@ try:
         # 데이터가 비어있지 않다면
         if not kospi.empty:
             # CSV 파일로 저장 (헤더 포함, 인덱스 제외)
-            kospi.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
+            kospi.to_csv('KOSPI.csv', mode='w', header=True, index=True, encoding='utf-8-sig')
             print("KOSPI 데이터를 KOSPI.csv에 저장했습니다.")
         else:
             print("KOSPI 데이터가 비어 있습니다. 날짜 범위를 확인해주세요.")
