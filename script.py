@@ -89,7 +89,16 @@ try:
     try:
         kospi = yf.download('^KS11', latest_kospi_date, enddate_kospi, auto_adjust=True)
         print(kospi)
-        kospi.to_csv('KOSPI.csv', mode='a', header=False, encoding='utf-8-sig')
+        # 기존 CSV 파일이 존재하면, 파일을 읽어서 헤더를 처리한 후 새로운 데이터 추가
+        try:
+            existing_df = pd.read_csv('KOSPI.csv')
+            # 기존 데이터가 있으면 첫 번째 행을 건너뛰고 추가 (헤더를 덮어쓰지 않음)
+            # 'Ticker' 행을 제거 (DataFrame에서 첫 번째 행을 삭제)
+            kospi_cleaned = kospi.iloc[3:]
+            kospi_cleaned.to_csv('KOSPI.csv', mode='a', header=False, index=False, encoding='utf-8-sig')
+        except FileNotFoundError:
+            # 파일이 없으면 헤더와 함께 저장
+            kospi.to_csv('KOSPI.csv', mode='w', header=True, index=False, encoding='utf-8-sig')
     except Exception as e:
         print("Error downloading KOSPI data:", e)
     
@@ -121,7 +130,7 @@ try:
     df_usd_krw = pd.DataFrame(rows_usd_krw)
     df_usd_krw['datetime'] = pd.to_datetime(df_usd_krw['TIME'].str[:4] + '-' + df_usd_krw['TIME'].str[4:6] + '-01')
     df_usd_krw = df_usd_krw.astype({'DATA_VALUE': 'float'})
-    
+    print(df_usd_krw[['datetime', 'DATA_VALUE']])
     # 환율 데이터를 CSV로 저장
     df_usd_krw[['datetime', 'DATA_VALUE']].to_csv('USD_KRW.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
 except Exception as e:
