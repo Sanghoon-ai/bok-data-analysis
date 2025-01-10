@@ -39,18 +39,17 @@ try:
 
     # KOSPI 데이터 읽기
     kospi_df = pd.read_csv('KOSPI.csv', skiprows=3)
-    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3)  # 첫 번째 열을 데이터로 읽기
+    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=2)  # 첫 번째 열을 데이터로 읽기
+
+    print("kospi_add_df :", kospi_add_df)
     
     # 컬럼 이름 설정
     kospi_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
-    kospi_add_df.columns = ['Price', 'Close', 'High', 'Low', 'Open', 'Volume']  # 첫 번째 열은 가격, 나머지는 동일
+    kospi_add_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']  # 첫 번째 열은 가격, 나머지는 동일
     
     # 'Date' 열을 datetime 형식으로 변환
     kospi_df['datetime'] = pd.to_datetime(kospi_df['Date'])
     kospi_add_df['datetime'] = pd.to_datetime(kospi_add_df['Date'])  # 'Date'열이 포함되었으므로 처리
-    
-    # kospi_add_df에서 불필요한 'Price' 열 제거
-    kospi_add_df = kospi_add_df.drop(columns=['Price'])
     
     # kospi_df와 kospi_add_df 결합
     kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['datetime', 'Close']]], ignore_index=True)
