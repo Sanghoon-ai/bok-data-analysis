@@ -41,7 +41,7 @@ try:
     kospi_df = pd.read_csv('KOSPI.csv', skiprows=3)
     kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=2)  # 첫 번째 열을 데이터로 읽기
 
-    print("kospi_add_df :", kospi_add_df)
+    # print("kospi_add_df :", kospi_add_df)
     
     # 컬럼 이름 설정
     kospi_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
@@ -58,7 +58,7 @@ try:
     kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')
     
     # 결과 출력
-    print(kospi_combined)
+    # print(kospi_combined)
     
     # 최신 날짜(last_date) 추출
     last_date = kospi_combined['datetime'].max().strftime('%Y-%m-%d')
@@ -94,7 +94,7 @@ try:
     # datetime과 DATA_VALUE 두 컬럼 모두 동일한 경우 중복 제거
     df_usd_krw_combined = df_usd_krw_combined.drop_duplicates(subset=['datetime', 'DATA_VALUE'], keep='last')
 
-    print(df_usd_krw_combined)
+    # print(df_usd_krw_combined)
     
     # 그래프 그리기
     fig = make_subplots(
