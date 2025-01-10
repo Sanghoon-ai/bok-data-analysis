@@ -65,7 +65,7 @@ jobs:
           git add chart_files/chart.html
           
           # rebase 계속 진행
-          git rebase --continue
+          git rebase --continue || (echo "Rebase failed. Aborting..." && git rebase --abort)
         fi
 
     - name: Push updates to repository
