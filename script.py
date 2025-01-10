@@ -81,8 +81,7 @@ try:
         try:
             # CSV 파일 읽기 (첫 두 행을 헤더로 사용)
             df = pd.read_csv(filename, header=2, index_col=0, parse_dates=True)
-    
-            print("kospi_csv_df :", df)
+            # print("kospi_csv_df :", df)
     
             # 가장 최근 날짜 추출
             latest_date = df.index.max()  # 인덱스에서 가장 최근 날짜 가져오기
