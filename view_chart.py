@@ -39,7 +39,9 @@ try:
 
     # KOSPI 데이터 결합
     kospi_df = pd.read_csv('KOSPI.csv', skiprows=3)
+    print(kospi_df)
     kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3)
+    print(kospi_add_df)
     kospi_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
     kospi_add_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
     kospi_df['datetime'] = pd.to_datetime(kospi_df['Date'])
