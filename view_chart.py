@@ -37,17 +37,28 @@ try:
     # 작업 디렉토리 확인
     print("현재 작업 디렉토리:", os.getcwd())
 
-    # KOSPI 데이터 결합
+    # KOSPI 데이터 읽기
     kospi_df = pd.read_csv('KOSPI.csv', skiprows=3)
-    print(kospi_df)
-    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3)
-    print(kospi_add_df)
+    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3, index_col=0)  # Date를 인덱스로 읽기
+    
+    # 컬럼 이름 설정
     kospi_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
-    kospi_add_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
+    kospi_add_df.columns = ['Close', 'High', 'Low', 'Open', 'Volume']  # 'Date'는 인덱스로 처리되므로 제외
+    
+    # 'Date' 열을 datetime 형식으로 변환
     kospi_df['datetime'] = pd.to_datetime(kospi_df['Date'])
-    kospi_add_df['datetime'] = pd.to_datetime(kospi_add_df['Date'])
-    kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['datetime', 'Close']]], ignore_index=True)
-    kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
+    kospi_add_df['datetime'] = pd.to_datetime(kospi_add_df.index)  # 인덱스를 datetime으로 변환
+    
+    # kospi_add_df가 비어있지 않은지 확인
+    if not kospi_add_df.empty:
+        # kospi_df와 kospi_add_df 결합
+        kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['Close', 'datetime']]], ignore_index=True)
+    else:
+        # kospi_add_df가 비어있으면 kospi_df만 사용
+        kospi_combined = kospi_df[['datetime', 'Close']]
+    
+    # 중복된 날짜는 마지막 값을 남기고 제거
+    kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')
 
     print(kospi_combined)
     
