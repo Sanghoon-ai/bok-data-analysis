@@ -15,10 +15,15 @@ try:
     # CSV 파일에서 최신 날짜 가져오기 함수
     def get_latest_date_from_csv(filename):
         try:
-            # header=None 및 index_col=0 사용
+            # CSV 파일 읽기 (첫 열이 날짜 값으로 사용됨)
             df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
-            latest_date = df.index.max()  # 첫 열(인덱스)에서 가장 최근 날짜 가져오기
-            return (latest_date + timedelta(days=1)).strftime('%Y%m%d')  # 최신 날짜 + 1일
+            latest_date = df.index.max()  # 인덱스에서 가장 최근 날짜 가져오기
+            if pd.notnull(latest_date):
+                # 날짜 + 1일 후 문자열 형식(YYYYMMDD)으로 반환
+                return (latest_date + timedelta(days=1)).strftime('%Y%m%d')
+            else:
+                # 날짜 값이 없을 경우 기본값 반환
+                return '19900101'
         except FileNotFoundError:
             # 파일이 없는 경우 기본 시작 날짜 반환
             return '19900101'
@@ -65,10 +70,15 @@ try:
     # CSV 파일에서 가장 최근 날짜 가져오기 함수
     def get_latest_date_from_kospi_csv(filename):
         try:
-            # header=None 및 index_col=0 사용
+            # CSV 파일 읽기 (첫 열이 날짜 값으로 사용됨)
             df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
-            latest_date = df.index.max()  # 첫 열(인덱스)에서 가장 최근 날짜 가져오기
-            return latest_date + timedelta(days=1)  # 최신 날짜의 다음 날
+            latest_date = df.index.max()  # 인덱스에서 가장 최근 날짜 가져오기
+            if pd.notnull(latest_date):
+                # 날짜 + 1일 반환 (datetime 객체)
+                return latest_date + timedelta(days=1)
+            else:
+                # 날짜 값이 없을 경우 기본값 반환
+                return pd.to_datetime('1996-01-01')
         except FileNotFoundError:
             # 파일이 없으면 기본 시작 날짜 반환
             return pd.to_datetime('1996-01-01')
