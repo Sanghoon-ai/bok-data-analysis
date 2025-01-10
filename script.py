@@ -58,22 +58,36 @@ try:
     print(df2)
     
     # CSV 파일 저장
-    df1[['datetime', 'DATA_VALUE']].to_csv('동행지수순환변동치.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
-    df2[['datetime', 'DATA_VALUE']].to_csv('선행지수순환변동치.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
+    df1[['datetime', 'DATA_VALUE']].to_csv('동행지수순환변동치_add.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
+    df2[['datetime', 'DATA_VALUE']].to_csv('선행지수순환변동치_add.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
+
+    # CSV 파일에서 가장 최근 날짜 가져오기 함수
+    def get_latest_date_from_kospi_csv(filename):
+        try:
+            # CSV 파일 읽기
+            df = pd.read_csv(filename, index_col=0, parse_dates=True)  # 첫 번째 열을 datetime으로 처리
+            latest_date = df.index.max()  # 인덱스에서 가장 큰 날짜(최신 날짜)
+            return latest_date + timedelta(days=1)  # 최신 날짜의 다음 날
+        except FileNotFoundError:
+            # 파일이 없으면 기본 시작 날짜 반환
+            return pd.to_datetime('1996-01-01')
 
     # 날짜 설정 (datetime 객체로 설정)
     enddate_kospi = pd.to_datetime('today')  # 오늘 날짜
+    # KOSPI 시작 날짜 설정
+    startdate_kospi = get_latest_date_from_kospi_csv('KOSPI.csv')
+    print("startdate_kospi :",startdate_kospi.strftime('%Y-%m-%d'))
     
     try:
         # KOSPI 데이터 다운로드
-        kospi = yf.download('^KS11', start='1996-01-01', end=enddate_kospi, auto_adjust=True)
+        kospi = yf.download('^KS11', start=startdate_kospi.strftime('%Y-%m-%d'), end=enddate_kospi, auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
     
         # 데이터가 비어있지 않다면
         if not kospi.empty:
             # CSV 파일로 저장 (헤더 포함, 인덱스 제외)
-            kospi.to_csv('KOSPI.csv', mode='w', header=True, index=True, encoding='utf-8-sig')
-            print("KOSPI 데이터를 KOSPI.csv에 저장했습니다.")
+            kospi.to_csv('KOSPI_add.csv', mode='w', header=True, index=True, encoding='utf-8-sig')
+            print("KOSPI 데이터를 KOSPI_add.csv에 저장했습니다.")
         else:
             print("KOSPI 데이터가 비어 있습니다. 날짜 범위를 확인해주세요.")
     
@@ -110,7 +124,7 @@ try:
     df_usd_krw = df_usd_krw.astype({'DATA_VALUE': 'float'})
     print(df_usd_krw[['datetime', 'DATA_VALUE']])
     # 환율 데이터를 CSV로 저장
-    df_usd_krw[['datetime', 'DATA_VALUE']].to_csv('USD_KRW.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
+    df_usd_krw[['datetime', 'DATA_VALUE']].to_csv('USD_KRW_add.csv', index=False, mode='a', header=False, encoding='utf-8-sig')
 except Exception as e:
     print(f"Error occurred: {e}")
     exit(1)  # 명시적으로 종료 코드 설정
