@@ -15,17 +15,26 @@ try:
     # CSV 파일에서 최신 날짜 가져오기 함수
     def get_latest_date_from_csv(filename):
         try:
-            # CSV 파일 읽기 (첫 열이 날짜 값으로 사용됨)
+            # CSV 파일 읽기 (첫 열을 날짜로 사용)
             df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
-            latest_date = df.index.max()  # 인덱스에서 가장 최근 날짜 가져오기
+    
+            # 인덱스에서 가장 최근 날짜 가져오기
+            latest_date = df.index.max()
+    
             if pd.notnull(latest_date):
                 # 날짜 + 1일 후 문자열 형식(YYYYMMDD)으로 반환
                 return (latest_date + timedelta(days=1)).strftime('%Y%m%d')
             else:
                 # 날짜 값이 없을 경우 기본값 반환
                 return '19900101'
+        
         except FileNotFoundError:
-            # 파일이 없는 경우 기본 시작 날짜 반환
+            # 파일이 없으면 기본 시작 날짜 반환
+            return '19900101'
+    
+        except Exception as e:
+            # 다른 예외가 발생하면 오류 메시지 출력 후 기본 날짜 반환
+            print(f"Error occurred while reading {filename}: {e}")
             return '19900101'
 
     # 동행지수순환변동치 데이터
