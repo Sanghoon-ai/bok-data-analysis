@@ -20,7 +20,7 @@ jobs:
 
       - name: Remove outdated CSV files
         run: |
-          files_to_remove=("KOSPI.csv" "USD_KRW.csv" "동행지수순환변동치.csv" "선행지수순환변동치.csv")
+          files_to_remove=("KOSPI_add.csv" "USD_KRW_add.csv" "동행지수순환변동치_add.csv" "선행지수순환변동치_add.csv")
           for file in "${files_to_remove[@]}"; do
             if [ -f "$file" ]; then
               git rm "$file"  # 파일 삭제
