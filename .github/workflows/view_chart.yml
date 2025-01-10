@@ -50,9 +50,20 @@ jobs:
         git add chart_files/chart.html  # 새로 생성된 chart.html 파일 추가
         git commit -m "Update chart_files/chart.html file" || echo "No changes to commit"  # 변경 사항이 있으면 커밋
 
-    - name: Pull latest changes and push updates
+    - name: Pull latest changes and resolve conflicts
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # 환경 변수로 GitHub Token 사용
       run: |
+        git fetch origin  # 원격 저장소의 최신 정보를 가져옵니다
         git pull origin main --rebase  # 원격 저장소의 최신 변경 사항 병합
+
+        # 충돌이 발생했을 경우 처리
+        if git ls-files -u | grep -q chart_files/chart.html; then
+          echo "Merge conflict detected, resolving manually"
+          git add chart_files/chart.html  # 충돌 해결 후 파일을 추가
+          git rebase --continue  # rebase 계속 진행
+        fi
+
+    - name: Push updates to repository
+      run: |
         git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # 변경 사항 푸시
