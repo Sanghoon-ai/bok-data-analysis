@@ -39,27 +39,26 @@ try:
 
     # KOSPI 데이터 읽기
     kospi_df = pd.read_csv('KOSPI.csv', skiprows=3)
-    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3, index_col=0)  # Date를 인덱스로 읽기
+    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3)  # 첫 번째 열을 데이터로 읽기
     
     # 컬럼 이름 설정
     kospi_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
-    kospi_add_df.columns = ['Close', 'High', 'Low', 'Open', 'Volume']  # 'Date'는 인덱스로 처리되므로 제외
+    kospi_add_df.columns = ['Price', 'Close', 'High', 'Low', 'Open', 'Volume']  # 첫 번째 열은 가격, 나머지는 동일
     
     # 'Date' 열을 datetime 형식으로 변환
     kospi_df['datetime'] = pd.to_datetime(kospi_df['Date'])
-    kospi_add_df['datetime'] = pd.to_datetime(kospi_add_df.index)  # 인덱스를 datetime으로 변환
+    kospi_add_df['datetime'] = pd.to_datetime(kospi_add_df['Date'])  # 'Date'열이 포함되었으므로 처리
     
-    # kospi_add_df가 비어있지 않은지 확인
-    if not kospi_add_df.empty:
-        # kospi_df와 kospi_add_df 결합
-        kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['Close', 'datetime']]], ignore_index=True)
-    else:
-        # kospi_add_df가 비어있으면 kospi_df만 사용
-        kospi_combined = kospi_df[['datetime', 'Close']]
+    # kospi_add_df에서 불필요한 'Price' 열 제거
+    kospi_add_df = kospi_add_df.drop(columns=['Price'])
+    
+    # kospi_df와 kospi_add_df 결합
+    kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['datetime', 'Close']]], ignore_index=True)
     
     # 중복된 날짜는 마지막 값을 남기고 제거
     kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')
-
+    
+    # 결과 출력
     print(kospi_combined)
     
     # 최신 날짜(last_date) 추출
@@ -93,7 +92,8 @@ try:
     df_usd_krw['datetime'] = pd.to_datetime(df_usd_krw['datetime'])
     df_usd_krw_add['datetime'] = pd.to_datetime(df_usd_krw_add['datetime'])
     df_usd_krw_combined = pd.concat([df_usd_krw, df_usd_krw_add], ignore_index=True)
-    df_usd_krw_combined = df_usd_krw_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
+    # datetime과 DATA_VALUE 두 컬럼 모두 동일한 경우 중복 제거
+    df_usd_krw_combined = df_usd_krw_combined.drop_duplicates(subset=['datetime', 'DATA_VALUE'], keep='last')
 
     print(df_usd_krw_combined)
     
