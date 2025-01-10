@@ -24,7 +24,7 @@ try:
             return '19900101'
 
     # 동행지수순환변동치 데이터
-    startdate_동행지수 = get_latest_date_from_csv('동행지수순환변동치.csv', 'datetime')[:6]  # YYYYMM까지만 추출
+    startdate_동행지수 = get_latest_date_from_csv('동행지수순환변동치.csv')[:6]  # YYYYMM까지만 추출
     enddate_동행지수 = enddate[:6]
     
     url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/1/100/901Y067/M/{startdate_동행지수}/{enddate_동행지수}'
@@ -96,7 +96,7 @@ try:
         print(f"Error downloading KOSPI data: {e}")
     
     # USD/KRW 환율 데이터 가져오기 (한국은행 API에서 FXX001으로 가져오기)
-    startdate_usdkrw = get_latest_date_from_csv('USD_KRW.csv', 'datetime')
+    startdate_usdkrw = get_latest_date_from_csv('USD_KRW.csv')
     url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/1/100/731Y001/D/{startdate_usdkrw}/{enddate}/0000001'
     response = requests.get(url)
     result = response.json()
