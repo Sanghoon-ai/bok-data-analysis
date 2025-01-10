@@ -79,16 +79,21 @@ try:
     # CSV 파일에서 가장 최근 날짜 가져오기 함수
     def get_latest_date_from_kospi_csv(filename):
         try:
-            # CSV 파일 읽기 (첫 열이 날짜 값으로 사용됨)
-            df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
-            print("kospi_csv_df :",df)
+            # CSV 파일 읽기 (첫 두 행을 헤더로 사용)
+            df = pd.read_csv(filename, header=2, index_col=0, parse_dates=True)
+    
+            print("kospi_csv_df :", df)
+    
+            # 가장 최근 날짜 추출
             latest_date = df.index.max()  # 인덱스에서 가장 최근 날짜 가져오기
+    
             if pd.notnull(latest_date):
                 # 날짜 + 1일 반환 (datetime 객체)
                 return latest_date + timedelta(days=1)
             else:
                 # 날짜 값이 없을 경우 기본값 반환
                 return pd.to_datetime('1996-01-01')
+    
         except FileNotFoundError:
             # 파일이 없으면 기본 시작 날짜 반환
             return pd.to_datetime('1996-01-01')
