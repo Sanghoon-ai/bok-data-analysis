@@ -47,6 +47,8 @@ try:
     kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['datetime', 'Close']]], ignore_index=True)
     kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
 
+    print(kospi_combined)
+    
     # 최신 날짜(last_date) 추출
     last_date = kospi_combined['datetime'].max().strftime('%Y-%m-%d')
 
@@ -80,6 +82,8 @@ try:
     df_usd_krw_combined = pd.concat([df_usd_krw, df_usd_krw_add], ignore_index=True)
     df_usd_krw_combined = df_usd_krw_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
 
+    print(df_usd_krw_combined)
+    
     # 그래프 그리기
     fig = make_subplots(
         rows=1, cols=1,
