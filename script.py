@@ -22,7 +22,7 @@ try:
             latest_date = df.index.max()
     
             if pd.notnull(latest_date):
-                # 날짜 + 1일 후 문자열 형식(YYYYMMDD)으로 반환
+                # 날짜가 datetime 객체로 반환되므로 이를 올바르게 처리
                 return (latest_date + timedelta(days=1)).strftime('%Y%m%d')
             else:
                 # 날짜 값이 없을 경우 기본값 반환
