@@ -13,10 +13,11 @@ try:
     enddate = datetime.now().strftime('%Y%m%d')
 
     # CSV 파일에서 최신 날짜 가져오기 함수
-    def get_latest_date_from_csv(filename, date_column):
+    def get_latest_date_from_csv(filename):
         try:
-            df = pd.read_csv(filename)
-            latest_date = pd.to_datetime(df[date_column]).max()
+            # header=None 및 index_col=0 사용
+            df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
+            latest_date = df.index.max()  # 첫 열(인덱스)에서 가장 최근 날짜 가져오기
             return (latest_date + timedelta(days=1)).strftime('%Y%m%d')  # 최신 날짜 + 1일
         except FileNotFoundError:
             # 파일이 없는 경우 기본 시작 날짜 반환
@@ -64,9 +65,9 @@ try:
     # CSV 파일에서 가장 최근 날짜 가져오기 함수
     def get_latest_date_from_kospi_csv(filename):
         try:
-            # CSV 파일 읽기
-            df = pd.read_csv(filename, index_col=0, parse_dates=True)  # 첫 번째 열을 datetime으로 처리
-            latest_date = df.index.max()  # 인덱스에서 가장 큰 날짜(최신 날짜)
+            # header=None 및 index_col=0 사용
+            df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
+            latest_date = df.index.max()  # 첫 열(인덱스)에서 가장 최근 날짜 가져오기
             return latest_date + timedelta(days=1)  # 최신 날짜의 다음 날
         except FileNotFoundError:
             # 파일이 없으면 기본 시작 날짜 반환
