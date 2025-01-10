@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
+import time
 
 # 절대 경로로 chart.html 저장
 output_dir = os.path.join(os.getcwd(), "chart_files")
@@ -12,9 +13,13 @@ if not os.path.exists(output_dir):
 # 필요한 파일 목록
 required_files = [
     "KOSPI.csv",
+    "KOSPI_add.csv",
     "동행지수순환변동치.csv",
+    "동행지수순환변동치_add.csv",
     "선행지수순환변동치.csv",
-    "USD_KRW.csv"
+    "선행지수순환변동치_add.csv",
+    "USD_KRW.csv",
+    "USD_KRW_add.csv"
 ]
 
 # 파일 존재 여부를 확인하고, 없으면 대기
@@ -32,48 +37,49 @@ try:
     # 작업 디렉토리 확인
     print("현재 작업 디렉토리:", os.getcwd())
 
-    # KOSPI.csv 파일에서 마지막 줄의 첫 번째 열(날짜) 가져오기
-    kospi_df = pd.read_csv('KOSPI.csv')
-    last_date = kospi_df.iloc[-1, 0]  # 마지막 줄의 첫 번째 열 값
-    print("last_date : ", last_date)
-    
-    # CSV 파일 읽기
-    df1 = pd.read_csv('동행지수순환변동치.csv')  # 첫 번째 열에 날짜 포함된 파일
-    df2 = pd.read_csv('선행지수순환변동치.csv')  # 첫 번째 열에 날짜 포함된 파일
-    df_usd_krw = pd.read_csv('USD_KRW.csv')  # 첫 번째 열에 날짜 포함된 파일
-    
-    # 첫 번째 열을 datetime 형식으로 변환
-    df1.iloc[:, 0] = pd.to_datetime(df1.iloc[:, 0])  # 첫 번째 열을 datetime으로 변환
-    df2.iloc[:, 0] = pd.to_datetime(df2.iloc[:, 0])  # 첫 번째 열을 datetime으로 변환
-    df_usd_krw.iloc[:, 0] = pd.to_datetime(df_usd_krw.iloc[:, 0])  # 첫 번째 열을 datetime으로 변환
+    # KOSPI 데이터 결합
+    kospi_df = pd.read_csv('KOSPI.csv', skiprows=3)
+    kospi_add_df = pd.read_csv('KOSPI_add.csv', skiprows=3)
+    kospi_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
+    kospi_add_df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
+    kospi_df['datetime'] = pd.to_datetime(kospi_df['Date'])
+    kospi_add_df['datetime'] = pd.to_datetime(kospi_add_df['Date'])
+    kospi_combined = pd.concat([kospi_df[['datetime', 'Close']], kospi_add_df[['datetime', 'Close']]], ignore_index=True)
+    kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
 
-    # 두 번째 열 이름을 'DATA_VALUE'로 변경
-    df1.columns = ['datetime', 'DATA_VALUE']  # 두 번째 열을 'DATA_VALUE'로 변경
-    df2.columns = ['datetime', 'DATA_VALUE']  # 두 번째 열을 'DATA_VALUE'로 변경
-    df_usd_krw.columns = ['datetime', 'DATA_VALUE']  # 두 번째 열을 'DATA_VALUE'로 변경
+    # 최신 날짜(last_date) 추출
+    last_date = kospi_combined['datetime'].max().strftime('%Y-%m-%d')
 
-    # KOSPI 데이터 CSV 파일 읽기
-    kospi = pd.read_csv('KOSPI.csv', skiprows=3)  # 첫 세 줄을 건너뛰고 데이터 읽기
-    
-    # 열 이름 설정
-    kospi.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
-    
-    # 'Date' 열을 datetime 형식으로 변환
-    kospi['datetime'] = pd.to_datetime(kospi['Date'])
-    
-    # CSV 파일 내용 확인
-    print("동행지수순환변동치.csv 내용:")
-    print(df1.head())
-    
-    print("선행지수순환변동치.csv 내용:")
-    print(df2.head())
-    
-    print("USD/KRW.csv 내용:")
-    print(df_usd_krw.head())
-    
-    print("KOSPI.csv 내용:")
-    print(kospi.head())
-    
+    # 동행지수 순환변동치 결합
+    df1 = pd.read_csv('동행지수순환변동치.csv')
+    df1_add = pd.read_csv('동행지수순환변동치_add.csv')
+    df1.columns = ['datetime', 'DATA_VALUE']
+    df1_add.columns = ['datetime', 'DATA_VALUE']
+    df1['datetime'] = pd.to_datetime(df1['datetime'])
+    df1_add['datetime'] = pd.to_datetime(df1_add['datetime'])
+    df1_combined = pd.concat([df1, df1_add], ignore_index=True)
+    df1_combined = df1_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
+
+    # 선행지수 순환변동치 결합
+    df2 = pd.read_csv('선행지수순환변동치.csv')
+    df2_add = pd.read_csv('선행지수순환변동치_add.csv')
+    df2.columns = ['datetime', 'DATA_VALUE']
+    df2_add.columns = ['datetime', 'DATA_VALUE']
+    df2['datetime'] = pd.to_datetime(df2['datetime'])
+    df2_add['datetime'] = pd.to_datetime(df2_add['datetime'])
+    df2_combined = pd.concat([df2, df2_add], ignore_index=True)
+    df2_combined = df2_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
+
+    # USD/KRW 환율 결합
+    df_usd_krw = pd.read_csv('USD_KRW.csv')
+    df_usd_krw_add = pd.read_csv('USD_KRW_add.csv')
+    df_usd_krw.columns = ['datetime', 'DATA_VALUE']
+    df_usd_krw_add.columns = ['datetime', 'DATA_VALUE']
+    df_usd_krw['datetime'] = pd.to_datetime(df_usd_krw['datetime'])
+    df_usd_krw_add['datetime'] = pd.to_datetime(df_usd_krw_add['datetime'])
+    df_usd_krw_combined = pd.concat([df_usd_krw, df_usd_krw_add], ignore_index=True)
+    df_usd_krw_combined = df_usd_krw_combined.drop_duplicates(subset='datetime', keep='last')  # 중복 제거
+
     # 그래프 그리기
     fig = make_subplots(
         rows=1, cols=1,
@@ -82,31 +88,31 @@ try:
     
     # 동행지수 순환변동치
     fig.add_trace(
-        go.Scatter(x=df1['datetime'], y=df1['DATA_VALUE'], name="동행지수순환변동치"),
+        go.Scatter(x=df1_combined['datetime'], y=df1_combined['DATA_VALUE'], name="동행지수순환변동치"),
         secondary_y=False,
     )
     
     # 선행지수 순환변동치
     fig.add_trace(
-        go.Scatter(x=df2['datetime'], y=df2['DATA_VALUE'], name="선행지수순환변동치"),
+        go.Scatter(x=df2_combined['datetime'], y=df2_combined['DATA_VALUE'], name="선행지수순환변동치"),
         secondary_y=False,
     )
     
     # KOSPI 데이터
     fig.add_trace(
-        go.Scatter(x=kospi['datetime'], y=kospi['Close'], name="KOSPI"),
+        go.Scatter(x=kospi_combined['datetime'], y=kospi_combined['Close'], name="KOSPI"),
         secondary_y=True,
     )
     
     # USD/KRW 환율 데이터
     fig.add_trace(
-        go.Scatter(x=df_usd_krw['datetime'], y=df_usd_krw['DATA_VALUE'], name="USD/KRW"),
+        go.Scatter(x=df_usd_krw_combined['datetime'], y=df_usd_krw_combined['DATA_VALUE'], name="USD/KRW"),
         secondary_y=True,
     )
     
     # 레이아웃 업데이트
     fig.update_layout(
-        title_text=f'선행지수변동치와 동행지수변동치, KOSPI, USD/KRW ({last_date})',
+        title_text=f'선행지수변동치와 동행지수순환변동치, KOSPI, USD/KRW ({last_date})',
         title={'x': 0.5, 'y': 0.9},  # 중앙 정렬
         xaxis=dict(
             title='날짜',
@@ -141,7 +147,6 @@ try:
     )
     
     # HTML 파일로 저장
-    # 차트를 그려서 chart_files 폴더에 저장
     fig.write_html(os.path.join(output_dir, "chart.html"))
     
     if os.path.exists("chart_files/chart.html"):
@@ -152,4 +157,3 @@ try:
     
 except Exception as e:
     print(f"Error occurred: {e}")
-
