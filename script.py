@@ -17,7 +17,7 @@ try:
         try:
             # CSV 파일 읽기 (첫 열을 날짜로 사용)
             df = pd.read_csv(filename, header=None, index_col=0, parse_dates=True)
-            print(df[-1])
+            print("csv 파일 df :", df)
             # 인덱스에서 가장 최근 날짜 가져오기
             latest_date = df.index.max()
     
