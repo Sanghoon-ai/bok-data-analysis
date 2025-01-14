@@ -17,20 +17,27 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}  # GitHub Personal Access Token 사용
+
+      - name: Set git config for commit
+        run: |
+          git config --global user.email "injea100@gmail.com"
+          git config --global user.name "Sanghoon-ai"
 
       - name: Remove outdated CSV files
         run: |
           files_to_remove=("KOSPI_add.csv" "USD_KRW_add.csv" "동행지수순환변동치_add.csv" "선행지수순환변동치_add.csv")
           for file in "${files_to_remove[@]}"; do
             if [ -f "$file" ]; then
-              git rm "$file"  # 파일 삭제
+              git rm "$file"
               echo "$file removed."
             else
               echo "$file does not exist."
             fi
           done
-          git commit -m "Remove outdated CSV files" || echo "No files to remove"  # 변경 사항 없으면 메시지 출력
-          
+          git commit -m "Remove outdated CSV files" || echo "No files to remove"
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -40,27 +47,22 @@ jobs:
         run: |
           pip install pandas requests yfinance
 
-      - name: Set git config for commit
-        run: |
-          git config --global user.email "injea100@gmail.com.com"  # Git 이메일 설정
-          git config --global user.name "Sanghoon-ai"  # Git 사용자 이름 설정
-
       - name: Run Python script
         run: |
-          python script.py || exit 1  # 스크립트 실패 시 명시적으로 오류 처리
+          python script.py || exit 1
 
       - name: Add and commit new CSV files
         run: |
-          git add $(find . -name "*.csv")  # 모든 CSV 파일 추가
-          git commit -m "Update CSV files" || echo "No changes to commit"  # 변경 사항 없으면 메시지 출력
+          git add $(find . -name "*.csv")
+          git commit -m "Update CSV files" || echo "No changes to commit"
 
       - name: Push changes
         run: |
-          git push || echo "Nothing to push"  # 변경 사항이 없을 경우 메시지 출력
+          git push || echo "Nothing to push"
 
       - name: Trigger view_chart.yml workflow
         run: |
           echo "Triggering view_chart.yml workflow after main.yml finishes"
-          gh workflow run view_chart.yml  # GitHub CLI를 사용하여 view_chart.yml 실행
+          gh workflow run view_chart.yml
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 환경 변수로 토큰을 전달
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
