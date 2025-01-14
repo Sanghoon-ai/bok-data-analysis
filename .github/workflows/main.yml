@@ -42,8 +42,8 @@ jobs:
 
       - name: Set git config for commit
         run: |
-          git config --global user.email "your-email@example.com"  # Git 이메일 설정
-          git config --global user.name "Your Name"  # Git 사용자 이름 설정
+          git config --global user.email "injea100@gmail.com.com"  # Git 이메일 설정
+          git config --global user.name "Sanghoon-ai"  # Git 사용자 이름 설정
 
       - name: Run Python script
         run: |
