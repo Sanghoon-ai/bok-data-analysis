@@ -101,7 +101,7 @@ try:
     enddate_kospi = pd.to_datetime('today')  # 오늘 날짜
     # KOSPI 시작 날짜 설정
     startdate_kospi = get_latest_date_from_kospi_csv('KOSPI.csv')
-    print("startdate_kospi :",startdate_kospi.strftime('%Y-%m-%d'))
+    print("startdate_kospi :",startdate_kospi.strftime('%Y-%m-%d'),"enddate_kospi :", enddate_kospi)
     
     try:
         # KOSPI 데이터 다운로드
