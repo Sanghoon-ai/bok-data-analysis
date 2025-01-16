@@ -101,11 +101,11 @@ try:
     enddate_kospi = pd.to_datetime('today')  # 오늘 날짜
     # KOSPI 시작 날짜 설정
     startdate_kospi = get_latest_date_from_kospi_csv('KOSPI.csv')
-    print("startdate_kospi :",startdate_kospi.strftime('%Y-%m-%d'),"enddate_kospi :", enddate_kospi)
+    print("startdate_kospi :",startdate_kospi.strftime('%Y-%m-%d'),"enddate_kospi :", enddate_kospi.strftime('%Y-%m-%d'))
     
     try:
         # KOSPI 데이터 다운로드
-        kospi = yf.download('^KS11', start=startdate_kospi.strftime('%Y-%m-%d'), end=enddate_kospi, auto_adjust=True)
+        kospi = yf.download('^KS11', start=startdate_kospi.strftime('%Y-%m-%d'), end=enddate_kospi.strftime('%Y-%m-%d'), auto_adjust=True)
         print(kospi)  # 다운로드한 데이터 출력
     
         # 데이터가 비어있지 않다면
