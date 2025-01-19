@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write  # 저장소 변경 권한 부여
 
+concurrency:
+  group: update-csv
+  cancel-in-progress: true
+
 jobs:
   update-csv:
     runs-on: ubuntu-22.04
