@@ -8,26 +8,25 @@ on:
     - cron: "10 0 * * *"  # 매일 자정 10분에 실행 (UTC)
 
 permissions:
-  contents: write  # 저장소 변경 권한 부여
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   update-and-generate:
     runs-on: ubuntu-22.04
 
     steps:
-      # 1. 저장소 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
 
-      # 2. Git 설정
       - name: Set git config for commit
         run: |
           git config --global user.email "injea100@gmail.com"
           git config --global user.name "Sanghoon-ai"
 
-      # 3. 기존 CSV 파일 제거
       - name: Remove outdated CSV files
         run: |
           files_to_remove=("KOSPI_add.csv" "USD_KRW_add.csv" "동행지수순환변동치_add.csv" "선행지수순환변동치_add.csv")
@@ -41,7 +40,6 @@ jobs:
           done
           git commit -m "Remove outdated CSV files" || echo "No files to remove"
 
-      # 4. Python 환경 설정 및 의존성 설치
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -49,35 +47,22 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests plotly yfinance  # 모든 필요한 의존성 한 번에 설치
+          pip install pandas requests plotly yfinance
 
-      # 5. CSV 업데이트 스크립트 실행
       - name: Run Python script for updating CSV
         run: |
           python script.py || exit 1
 
-      # 6. 변경된 CSV 파일 커밋 및 푸시
-      - name: Add and commit new CSV files
-        run: |
-          git add $(find . -name "*.csv")
-          git commit -m "Update CSV files" || echo "No changes to commit"
-
-      - name: Push changes
-        run: |
-          git push || echo "Nothing to push"
-
-      # 7. Chart 생성 스크립트 실행
       - name: Run Python script to generate chart
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'push' }}
         run: |
           python view_chart.py
 
-      # 8. Chart 파일 커밋 및 푸시
-      - name: Add and commit chart.html
+      - name: Add and commit all changes
         run: |
-          git add chart_files/chart.html
-          git commit -m "Update chart_files/chart.html file" || echo "No changes to commit"
+          git add .
+          git commit -m "Update CSV files and charts" || echo "No changes to commit"
 
-      - name: Push chart updates
+      - name: Push all changes
         run: |
           git push || echo "Nothing to push"
-
