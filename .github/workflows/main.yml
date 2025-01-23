@@ -47,9 +47,9 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install dependencies for CSV update
+      - name: Install dependencies
         run: |
-          pip install pandas requests yfinance
+          pip install pandas requests plotly yfinance  # 모든 필요한 의존성 한 번에 설치
 
       # 5. CSV 업데이트 스크립트 실행
       - name: Run Python script for updating CSV
@@ -66,22 +66,18 @@ jobs:
         run: |
           git push || echo "Nothing to push"
 
-      # 7. Chart 생성용 의존성 설치
-      - name: Install dependencies for chart generation
-        run: |
-          pip install pandas requests plotly yfinance
-
-      # 8. Chart 생성 스크립트 실행
+      # 7. Chart 생성 스크립트 실행
       - name: Run Python script to generate chart
         run: |
           python view_chart.py
 
-      # 9. Chart 파일 커밋 및 푸시
+      # 8. Chart 파일 커밋 및 푸시
       - name: Add and commit chart.html
         run: |
           git add chart_files/chart.html
           git commit -m "Update chart_files/chart.html file" || echo "No changes to commit"
 
-      - name: Push chart changes to repository
+      - name: Push chart updates
         run: |
-          git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} HEAD:main || echo "Nothing to push"
+          git push || echo "Nothing to push"
+
