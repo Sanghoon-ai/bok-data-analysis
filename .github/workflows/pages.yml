@@ -1,0 +1,24 @@
+name: Pages Build and Deployment
+
+on:
+  workflow_run:
+    workflows:
+      - Update CSV Files and Generate Chart  # main.yml에서 설정된 워크플로우 이름
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # 1. 리포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. GitHub Pages에 배포
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./charts  # 배포할 디렉토리 (CSV와 차트 파일이 저장된 경로)
