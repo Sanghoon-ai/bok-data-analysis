@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "10 0 * * *"  # 매일 자정 10분에 실행 (UTC)
+    - cron: "10 3 * * *"  # 매일 오전 3시 10분에 실행 (UTC)
 
 permissions:
   contents: write
