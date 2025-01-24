@@ -58,7 +58,7 @@ try:
     kospi_combined = kospi_combined.drop_duplicates(subset='datetime', keep='last')
     
     # 결과 출력
-    # print(kospi_combined)
+    print(kospi_combined)
     
     # 최신 날짜(last_date) 추출
     last_date = kospi_combined['datetime'].max().strftime('%Y-%m-%d')
