@@ -19,14 +19,17 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      # 1. 리포지토리 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2. Git 설정
       - name: Set git config for commit
         run: |
           git config --global user.email "injea100@gmail.com"
           git config --global user.name "Sanghoon-ai"
 
+      # 3. 오래된 CSV 파일 제거
       - name: Remove outdated CSV files
         run: |
           files_to_remove=("KOSPI_add.csv" "USD_KRW_add.csv" "동행지수순환변동치_add.csv" "선행지수순환변동치_add.csv")
@@ -40,29 +43,35 @@ jobs:
           done
           git commit -m "Remove outdated CSV files" || echo "No files to remove"
 
+      # 4. Python 환경 설정
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: 3.9
 
+      # 5. Python 의존성 설치
       - name: Install dependencies
         run: |
           pip install pandas requests plotly yfinance
 
+      # 6. CSV 업데이트 스크립트 실행
       - name: Run Python script for updating CSV
         run: |
           python script.py || exit 1
 
+      # 7. 차트 생성 스크립트 실행
       - name: Run Python script to generate chart
         if: ${{ github.event_name == 'schedule' || github.event_name == 'push' }}
         run: |
           python view_chart.py
 
+      # 8. 변경 사항 커밋
       - name: Add and commit all changes
         run: |
           git add .
           git commit -m "Update CSV files and charts" || echo "No changes to commit"
 
+      # 9. 변경 사항 푸시
       - name: Push all changes
         run: |
           git push || echo "Nothing to push"
