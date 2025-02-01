@@ -62,7 +62,8 @@ try:
     
     # 최신 날짜(last_date) 추출
     last_date = kospi_combined['datetime'].max().strftime('%Y-%m-%d')
-
+    print(last_date)
+    
     # 동행지수 순환변동치 결합
     df1 = pd.read_csv('동행지수순환변동치.csv')
     df1_add = pd.read_csv('동행지수순환변동치_add.csv')
