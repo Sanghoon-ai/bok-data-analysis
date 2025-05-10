@@ -44,11 +44,11 @@ jobs:
           done
           git commit -m "Remove outdated CSV files" || echo "No files to remove"
 
-      # 4. Python 환경 설정
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      # 4. Python 환경 설정 (Python 3.10)
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: '3.10'
 
       # 5. Python 의존성 설치
       - name: Install dependencies
