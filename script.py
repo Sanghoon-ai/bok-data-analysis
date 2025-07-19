@@ -36,6 +36,8 @@ try:
 
     url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/1/100/901Y067/M/{startdate_동행지수}/{enddate_동행지수}'
     response = requests.get(url)
+    # 응답 내용 인코딩 강제 지정 (필요 시)
+    response.encoding = 'utf-8'  # UTF-8로 강제 디코딩
     if response.status_code != 200:
         print(f"❌ 요청 실패! URL: {url}")
         print(f"상태 코드: {response.status_code}, 응답: {response.text[:300]}")
@@ -51,6 +53,8 @@ try:
         end = str((i + 1) * 100)
         url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/{start}/{end}/901Y067/M/{startdate_동행지수}/{enddate_동행지수}'
         response = requests.get(url)
+        # 응답 내용 인코딩 강제 지정 (필요 시)
+        response.encoding = 'utf-8'  # UTF-8로 강제 디코딩
         if response.status_code != 200:
             print(f"❌ 요청 실패! URL: {url}")
             print(f"상태 코드: {response.status_code}, 응답: {response.text[:300]}")
@@ -99,6 +103,8 @@ try:
     startdate_usdkrw = get_latest_date_from_csv('USD_KRW.csv')
     url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/1/100/731Y001/D/{startdate_usdkrw}/{enddate}/0000001'
     response = requests.get(url)
+    # 응답 내용 인코딩 강제 지정 (필요 시)
+    response.encoding = 'utf-8'  # UTF-8로 강제 디코딩
     if response.status_code != 200:
         print(f"❌ 환율 요청 실패! URL: {url}")
         print(f"상태 코드: {response.status_code}, 응답: {response.text[:300]}")
@@ -115,6 +121,8 @@ try:
             end = str((i + 1) * 100)
             url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/{start}/{end}/731Y001/D/{startdate_usdkrw}/{enddate}/0000001'
             response = requests.get(url)
+            # 응답 내용 인코딩 강제 지정 (필요 시)
+            response.encoding = 'utf-8'  # UTF-8로 강제 디코딩
             if response.status_code != 200:
                 print(f"❌ 환율 반복 요청 실패! URL: {url}")
                 print(f"상태 코드: {response.status_code}, 응답: {response.text[:300]}")
