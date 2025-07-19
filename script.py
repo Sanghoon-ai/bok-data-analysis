@@ -13,11 +13,11 @@ try:
     enddate = datetime.now().strftime('%Y%m%d')
     
     def safe_get_json(response):
-    try:
-        return response.json()
-    except ValueError:
-        print("⚠️ 응답이 JSON 형식이 아님:", response.text[:200])  # 일부만 출력
-        return None
+        try:
+            return response.json()
+        except ValueError:
+            print("⚠️ 응답이 JSON 형식이 아님:", response.text[:200])  # 일부만 출력
+            return None
         
     # CSV 파일에서 최신 날짜 가져오기 함수
     def get_latest_date_from_csv(filename):
