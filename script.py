@@ -11,7 +11,14 @@ try:
     
     # 오늘 날짜 가져오기
     enddate = datetime.now().strftime('%Y%m%d')
-
+    
+    def safe_get_json(response):
+    try:
+        return response.json()
+    except ValueError:
+        print("⚠️ 응답이 JSON 형식이 아님:", response.text[:200])  # 일부만 출력
+        return None
+        
     # CSV 파일에서 최신 날짜 가져오기 함수
     def get_latest_date_from_csv(filename):
         try:
@@ -43,7 +50,14 @@ try:
     
     url = f'https://ecos.bok.or.kr/api/StatisticSearch/{apikey}/json/kr/1/100/901Y067/M/{startdate_동행지수}/{enddate_동행지수}'
     response = requests.get(url)
-    result = response.json()
+    
+    if response.status_code != 200:
+        print(f"❌ 요청 실패! 상태 코드: {response.status_code}, 응답: {response.text[:200]}")
+        raise Exception("API 요청 실패")
+    
+    result = safe_get_json(response)
+    if result is None:
+        raise Exception("Invalid JSON response")
     
     # 전체 데이터 가져오기
     list_total_count = int(result['StatisticSearch']['list_total_count'])
