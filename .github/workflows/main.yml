@@ -77,10 +77,12 @@ jobs:
         run: |
           git push || echo "Nothing to push"
 
-      # 10. 생성된 차트를 GitHub Pages에 최종 배포 (폴더 경로 수정 완료)
+      # 10. 프로젝트 전체를 GitHub Pages에 최종 배포
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./chart_files  # 🔥 view_chart.py 파일
+          publish_dir: .  # 🔥 루트 디렉토리를 지정하여 index.html과 차트 폴더를 모두 배포합니다.
+          # 웹사이트에 노출될 필요가 없는 원본 소스코드와 데이터 파일들은 제외합니다.
+          exclude_assets: '.github,*.py,*.csv,.gitignore'
           force_orphan: true
