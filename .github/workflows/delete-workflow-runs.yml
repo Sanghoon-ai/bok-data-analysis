@@ -14,50 +14,57 @@ jobs:
       - name: Delete All Workflow Runs Permanently
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 깃허브 변수를 변환 오류가 없는 환경변수(ENV) 영역으로 안전하게 먼저 안전하게 넘깁니다.
+          REPO_NAME: ${{ github.repository }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
         run: |
           echo "리포지토리의 모든 워크플로우 기록 삭제를 시작합니다..."
-          
-          # 현재 청소 작업을 수행 중인 자기 자신의 Run ID를 가져와 제외합니다.
-          CURRENT_RUN_ID="${{ github.run_id }}"
+          echo "대상 리포지토리: $REPO_NAME"
+          echo "현재 실행 ID (제외 대상): $CURRENT_RUN_ID"
           
           while true; do
-            # 한 번에 100개씩 목록을 가져옵니다.
+            # 올바른 GitHub API 엔드포인트 주소로 요청을 보냅니다.
             response_json=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
                                  -H "Accept: application/vnd.github+json" \
-                                 "https://github.com{{ github.repository }}/actions/runs?per_page=100")
+                                 "https://github.com")
             
-            # 가져온 목록에서 ID 추출
-            runs=$(echo "$response_json" | jq '.workflow_runs[].id')
+            # API 응답에서 워크플로우 ID들을 추출합니다.
+            runs=$(echo "$response_json" | jq -r '.workflow_runs[].id' 2>/dev/null)
             
-            # 더 이상 지울 기록이 없거나, 자기 자신만 남은 경우 종료
-            if [ -z "$runs" ] || [ "$runs" = "$CURRENT_RUN_ID" ]; then
+            # 더 이상 지울 기록이 없거나 데이터가 비어있으면 루프를 종료합니다.
+            if [ -z "$runs" ]; then
               echo "더 이상 삭제할 과거 기록이 없습니다."
               break
             fi
+
+            # 만약 목록에 자기 자신(현재 작업) 딱 1개만 남았다면 종료합니다.
+            if [ "$runs" = "$CURRENT_RUN_ID" ]; then
+              echo "현재 실행 중인 청소 작업만 남았습니다. 삭제를 종료합니다."
+              break
+            fi
             
-            # 루프를 돌며 삭제 실행
+            # 목록에 포함된 ID들을 하나씩 삭제합니다.
             for run_id in $runs; do
-              # 현재 돌아가고 있는 자기 자신은 지우지 않고 건너뜁니다.
+              # 현재 작동 중인 청소 스크립트 자신은 지우지 않고 패스합니다.
               if [ "$run_id" = "$CURRENT_RUN_ID" ]; then
                 continue
               fi
               
-              echo "삭제 중인 ID: $run_id"
+              echo "삭제 진행 중인 워크플로우 ID: $run_id"
               status_code=$(curl -X DELETE -s -w "%{http_code}" -o /dev/null \
                 -H "Authorization: token $GITHUB_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
-                "https://github.com{{ github.repository }}/actions/runs/$run_id")
+                "https://github.com")
               
               if [ "$status_code" = "204" ]; then
-                echo "=> 삭제 성공"
+                echo " => 삭제 완료"
               else
-                echo "=> 삭제 실패 (HTTP 코드: $status_code)"
+                echo " => 삭제 실패 (HTTP 상태 코드: $status_code)"
               fi
             done
             
-            # API 제한(Rate Limit)을 방지하기 위해 1초간 휴식 후 다음 100개 확인
-            echo "다음 100개 묶음을 확인합니다..."
+            echo "100개 묶음 청소 완료. 다음 목록을 다시 확인합니다..."
             sleep 1
           done
           
-          echo "🎉 모든 과거 워크플로우 실행 기록이 성공적으로 청소되었습니다!"
+          echo "🎉 모든 과거 워크플로우 실행 기록 청소가 완벽하게 완료되었습니다!"
