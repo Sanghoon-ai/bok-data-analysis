@@ -10,11 +10,19 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-22.04
+    # 권한 설정 추가: 리포지토리 내용을 읽고 쓸 수 있는 권한을 부여합니다.
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
 
     steps:
-      # 1. 리포지토리 체크아웃
+      # 1. 리포지토리 체크아웃 수정
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # workflow_run 이벤트에서는 트리거를 일으킨 원본 브랜치를 명확히 지정해야 안전합니다.
+          ref: ${{ github.event.workflow_run.head_branch }}
 
       # 2. GitHub Pages에 배포
       - name: Deploy to GitHub Pages
