@@ -1,13 +1,14 @@
 name: Delete Workflow Runs
 
+# ❌ push: 이나 schedule: 같은 자동 트리거를 절대 작성하지 않습니다.
 on:
-  workflow_dispatch:  # 수동 트리거 버튼 생성
+  workflow_dispatch:  # 🔥 오직 GitHub 웹사이트에서 "Run workflow" 버튼을 누를 때만 작동합니다.
 
 jobs:
   delete-runs:
     runs-on: ubuntu-latest
     permissions:
-      actions: write  # Actions 기록을 수정/삭제할 수 있는 권한을 명시합니다.
+      actions: write
       contents: read
 
     steps:
@@ -19,11 +20,7 @@ jobs:
           echo "🚀 최근 100개의 워크플로우 기록 삭제를 시작합니다."
           echo "=========================================="
           
-          # 현재 실행 중인 이 청소 작업의 ID를 확보하여 삭제 대상에서 제외합니다.
           CURRENT_RUN_ID="${{ github.run_id }}"
-          
-          # 깃허브 공식 CLI 도구(gh)를 사용하여 최근 기록 100개의 ID를 안전하게 수집합니다.
-          # --limit 100 옵션으로 딱 100개씩만 끊어서 가져옵니다.
           runs=$(gh run list --limit 100 --json databaseId -q '.[].databaseId')
           
           if [ -z "$runs" ]; then
@@ -31,17 +28,13 @@ jobs:
             exit 0
           fi
           
-          # 가져온 ID들을 루프 돌며 순차적으로 완전 삭제 처리합니다.
           for run_id in $runs; do
-            # 현재 작동하고 있는 청소기 자신은 지우지 않고 패스합니다.
             if [ "$run_id" = "$CURRENT_RUN_ID" ]; then
               echo "• ID $run_id (현재 청소 작업) -> 안전하게 제외"
               continue
             fi
             
             echo "🗑️ 과거 기록 영구 삭제 중 -> ID: $run_id"
-            
-            # gh run delete 명령어로 권한 거부 없이 강제 삭제를 집행합니다.
             if gh run delete "$run_id" --yes; then
               echo "   => ✅ 완전 삭제 성공"
             else
