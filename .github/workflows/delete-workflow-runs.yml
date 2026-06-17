@@ -1,77 +1,54 @@
 name: Delete Workflow Runs
 
 on:
-  workflow_dispatch:  # 수동 트리거
+  workflow_dispatch:  # 수동 트리거 버튼 생성
 
 jobs:
   delete-runs:
     runs-on: ubuntu-latest
     permissions:
-      actions: write
+      actions: write  # Actions 기록을 수정/삭제할 수 있는 권한을 명시합니다.
       contents: read
 
     steps:
-      - name: Delete All Workflow Runs Permanently
+      - name: Delete 100 Workflow Runs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO_NAME: ${{ github.repository }}
-          CURRENT_RUN_ID: ${{ github.run_id }}
         run: |
           echo "=========================================="
-          echo "🚀 워크플로우 대청소 스크립트를 시작합니다."
+          echo "🚀 최근 100개의 워크플로우 기록 삭제를 시작합니다."
           echo "=========================================="
-          echo "• 대상 저장소: $REPO_NAME"
-          echo "• 안전 제외 ID (현재 작업): $CURRENT_RUN_ID"
           
-          # [디버그 1] API가 정상 작동하는지 가볍게 먼저 찔러봅니다.
-          echo "• GitHub API 연결 상태 점검 중..."
-          test_api=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $GITHUB_TOKEN" "https://github.com")
-          echo "  => API 응답 코드: $test_api (200이 나와야 정상입니다)"
-
-          while true; do
-            # 100개씩 목록 수집
-            response_json=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                                 -H "Accept: application/vnd.github+json" \
-                                 "https://github.com?per_page=100")
-            
-            # 수집된 목록 총 개수 파악
-            total_count=$(echo "$response_json" | jq '.total_count' 2>/dev/null)
-            echo "• 현재 원격 저장소에 감지된 총 기록 수: $total_count"
-
-            runs=$(echo "$response_json" | jq -r '.workflow_runs[].id' 2>/dev/null)
-            
-            if [ -z "$runs" ]; then
-              echo "💡 [안내] 수집된 기록 ID 목록이 완전히 비어 있습니다. 삭제를 종료합니다."
-              break
-            fi
-
-            if [ "$runs" = "$CURRENT_RUN_ID" ]; then
-              echo "💡 [안내] 현재 실행 중인 청소기 외에는 과거 기록이 없습니다. 종료합니다."
-              break
+          # 현재 실행 중인 이 청소 작업의 ID를 확보하여 삭제 대상에서 제외합니다.
+          CURRENT_RUN_ID="${{ github.run_id }}"
+          
+          # 깃허브 공식 CLI 도구(gh)를 사용하여 최근 기록 100개의 ID를 안전하게 수집합니다.
+          # --limit 100 옵션으로 딱 100개씩만 끊어서 가져옵니다.
+          runs=$(gh run list --limit 100 --json databaseId -q '.[].databaseId')
+          
+          if [ -z "$runs" ]; then
+            echo "💡 삭제할 과거 기록이 없습니다."
+            exit 0
+          fi
+          
+          # 가져온 ID들을 루프 돌며 순차적으로 완전 삭제 처리합니다.
+          for run_id in $runs; do
+            # 현재 작동하고 있는 청소기 자신은 지우지 않고 패스합니다.
+            if [ "$run_id" = "$CURRENT_RUN_ID" ]; then
+              echo "• ID $run_id (현재 청소 작업) -> 안전하게 제외"
+              continue
             fi
             
-            for run_id in $runs; do
-              if [ "$run_id" = "$CURRENT_RUN_ID" ]; then
-                continue
-              fi
-              
-              echo "🗑️ 삭제 중 -> ID: $run_id"
-              status_code=$(curl -X DELETE -s -w "%{http_code}" -o /dev/null \
-                -H "Authorization: token $GITHUB_TOKEN" \
-                -H "Accept: application/vnd.github+json" \
-                "https://github.com/$run_id")
-              
-              if [ "$status_code" = "204" ]; then
-                echo "   => ✅ 삭제 성공"
-              else
-                echo "   => ❌ 삭제 거부 (HTTP 코드: $status_code)"
-              fi
-            done
+            echo "🗑️ 과거 기록 영구 삭제 중 -> ID: $run_id"
             
-            echo "🔄 100개 묶음 처리 완료. 2초 대기 후 다음 페이지를 탐색합니다..."
-            sleep 2
+            # gh run delete 명령어로 권한 거부 없이 강제 삭제를 집행합니다.
+            if gh run delete "$run_id" --yes; then
+              echo "   => ✅ 완전 삭제 성공"
+            else
+              echo "   => ❌ 삭제 실패"
+            fi
           done
           
           echo "=========================================="
-          echo "🎉 대청소 프로세스가 종료되었습니다!"
+          echo "🎉 100개 단위의 청소 프로세스가 완료되었습니다!"
           echo "=========================================="
