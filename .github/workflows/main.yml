@@ -76,3 +76,11 @@ jobs:
       - name: Push all changes
         run: |
           git push || echo "Nothing to push"
+
+      # 🔥 10. 생성된 charts 폴더를 GitHub Pages에 최종 배포 (새로 추가됨)
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./charts
+          force_orphan: true  # fatal: a branch named 'gh-pages' already exists 충돌 해결
