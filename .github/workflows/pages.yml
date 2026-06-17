@@ -31,4 +31,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./charts  # 배포할 디렉토리
+          publish_dir: .  # 🔥 루트(.)를 지정해야 대문 index.html과 차트 폴더가 세트로 같이 올라갑니다.
+          # 웹사이트 방문자에게 노출될 필요가 없는 파이썬 소스코드와 데이터 파일들은 안전하게 걸러냅니다.
+          exclude_assets: '.github,*.py,*.csv,.gitignore'
+          force_orphan: true  # fatal: a branch named 'gh-pages' already exists 깃 충돌
