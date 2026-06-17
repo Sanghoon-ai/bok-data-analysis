@@ -1,32 +1,46 @@
 name: Delete Workflow Runs
 
 on:
-  workflow_dispatch:  # 수동 트리거를 허용
+  workflow_dispatch:  # GitHub 웹사이트에서 버튼을 눌러 수동 트리거
 
 jobs:
   delete-runs:
     runs-on: ubuntu-latest
+    # 🔥 기본 GITHUB_TOKEN에 다른 실행 기록을 삭제할 수 있는 강력한 권한을 부여합니다.
+    permissions:
+      actions: write
+      contents: read
 
     steps:
-      - name: Install jq
-        run: sudo apt-get install jq
-
       - name: Delete Workflow Runs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 모든 워크플로우 실행 기록 가져오기
+          echo "모든 워크플로우 실행 기록을 가져옵니다..."
+          
+          # ?per_page=100을 추가하여 최근 100개의 기록을 한 번에 가져옵니다.
           runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
                        -H "Accept: application/vnd.github+json" \
-                       "https://api.github.com/repos/${{ github.repository }}/actions/runs" \
+                       "https://github.com{{ github.repository }}/actions/runs?per_page=100" \
                        | jq '.workflow_runs[].id')
+          
+          if [ -z "$runs" ]; then
+              echo "삭제할 실행 기록이 없습니다."
+              exit 0
+          fi
 
-          # 실행 기록 삭제
+          # 발견된 실행 기록을 루프 돌며 순차적으로 삭제
           for run_id in $runs; do
-              echo "Deleting workflow run ID: $run_id"
-              curl -X DELETE -s -H "Authorization: token $GITHUB_TOKEN" \
+              echo "삭제 중인 워크플로우 실행 ID: $run_id"
+              response=$(curl -X DELETE -s -w "%{http_code}" -o /dev/null \
+                  -H "Authorization: token $GITHUB_TOKEN" \
                   -H "Accept: application/vnd.github+json" \
-                  "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+                  "https://github.com{{ github.repository }}/actions/runs/$run_id")
+              
+              if [ "$response" = "204" ]; then
+                  echo "=> ID $run_id 삭제 성공"
+              else
+                  echo "=> ID $run_id 삭제 실패 (HTTP 응답 코드: $response)"
+              fi
           done
-
-          echo "All workflow runs deleted."
+          echo "선택한 범위의 모든 워크플로우 삭제 프로세스가 완료되었습니다."
