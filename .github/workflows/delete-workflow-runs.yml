@@ -1,8 +1,7 @@
 name: Delete Workflow Runs
 
-# ❌ push: 이나 schedule: 같은 자동 트리거를 절대 작성하지 않습니다.
 on:
-  workflow_dispatch:  # 🔥 오직 GitHub 웹사이트에서 "Run workflow" 버튼을 누를 때만 작동합니다.
+  workflow_dispatch:  # 수동 버튼 트리거만 허용
 
 jobs:
   delete-runs:
@@ -15,12 +14,17 @@ jobs:
       - name: Delete 100 Workflow Runs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 🔥 gh 도구가 길을 잃지 않도록 현재 저장소 이름을 강제로 인식시킵니다.
+          GH_REPO: ${{ github.repository }}
         run: |
           echo "=========================================="
           echo "🚀 최근 100개의 워크플로우 기록 삭제를 시작합니다."
           echo "=========================================="
+          echo "• 대상 저장소: $GH_REPO"
           
           CURRENT_RUN_ID="${{ github.run_id }}"
+          
+          # GH_REPO 환경변수가 주입되어 디렉토리 에러 없이 목록을 정상적으로 가져옵니다.
           runs=$(gh run list --limit 100 --json databaseId -q '.[].databaseId')
           
           if [ -z "$runs" ]; then
@@ -45,3 +49,4 @@ jobs:
           echo "=========================================="
           echo "🎉 100개 단위의 청소 프로세스가 완료되었습니다!"
           echo "=========================================="
+
