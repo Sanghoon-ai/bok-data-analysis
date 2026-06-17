@@ -60,7 +60,7 @@ jobs:
         run: |
           python script.py || exit 1
 
-      # 7. 차트 생성 스크립트 실행
+      # 7. 차트 생성 스크립트 실행 (이 단계에서 chart_files/chart.html이 생성됩니다)
       - name: Run Python script to generate chart
         if: ${{ github.event_name == 'schedule' || github.event_name == 'push' }}
         run: |
@@ -77,10 +77,9 @@ jobs:
         run: |
           git push || echo "Nothing to push"
 
-      # 🔥 10. 생성된 charts 폴더를 GitHub Pages에 최종 배포 (새로 추가됨)
+      # 10. 생성된 차트를 GitHub Pages에 최종 배포 (폴더 경로 수정 완료)
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./charts
-          force_orphan: true  # fatal: a branch named 'gh-pages' already exists 충돌 해결
+          publish_dir: ./chart_files  # 🔥 view_chart.py 파일 
