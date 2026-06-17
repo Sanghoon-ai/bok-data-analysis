@@ -82,4 +82,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./chart_files  # 🔥 view_chart.py 파일 
+          publish_dir: ./chart_files  # 🔥 view_chart.py 파일
+          force_orphan: true
