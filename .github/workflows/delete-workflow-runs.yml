@@ -1,46 +1,63 @@
 name: Delete Workflow Runs
 
 on:
-  workflow_dispatch:  # GitHub 웹사이트에서 버튼을 눌러 수동 트리거
+  workflow_dispatch:  # 수동 트리거
 
 jobs:
   delete-runs:
     runs-on: ubuntu-latest
-    # 🔥 기본 GITHUB_TOKEN에 다른 실행 기록을 삭제할 수 있는 강력한 권한을 부여합니다.
     permissions:
       actions: write
       contents: read
 
     steps:
-      - name: Delete Workflow Runs
+      - name: Delete All Workflow Runs Permanently
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "모든 워크플로우 실행 기록을 가져옵니다..."
+          echo "리포지토리의 모든 워크플로우 기록 삭제를 시작합니다..."
           
-          # ?per_page=100을 추가하여 최근 100개의 기록을 한 번에 가져옵니다.
-          runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                       -H "Accept: application/vnd.github+json" \
-                       "https://github.com{{ github.repository }}/actions/runs?per_page=100" \
-                       | jq '.workflow_runs[].id')
+          # 현재 청소 작업을 수행 중인 자기 자신의 Run ID를 가져와 제외합니다.
+          CURRENT_RUN_ID="${{ github.run_id }}"
           
-          if [ -z "$runs" ]; then
-              echo "삭제할 실행 기록이 없습니다."
-              exit 0
-          fi
-
-          # 발견된 실행 기록을 루프 돌며 순차적으로 삭제
-          for run_id in $runs; do
-              echo "삭제 중인 워크플로우 실행 ID: $run_id"
-              response=$(curl -X DELETE -s -w "%{http_code}" -o /dev/null \
-                  -H "Authorization: token $GITHUB_TOKEN" \
-                  -H "Accept: application/vnd.github+json" \
-                  "https://github.com{{ github.repository }}/actions/runs/$run_id")
-              
-              if [ "$response" = "204" ]; then
-                  echo "=> ID $run_id 삭제 성공"
-              else
-                  echo "=> ID $run_id 삭제 실패 (HTTP 응답 코드: $response)"
+          while true; do
+            # 한 번에 100개씩 목록을 가져옵니다.
+            response_json=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                                 -H "Accept: application/vnd.github+json" \
+                                 "https://github.com{{ github.repository }}/actions/runs?per_page=100")
+            
+            # 가져온 목록에서 ID 추출
+            runs=$(echo "$response_json" | jq '.workflow_runs[].id')
+            
+            # 더 이상 지울 기록이 없거나, 자기 자신만 남은 경우 종료
+            if [ -z "$runs" ] || [ "$runs" = "$CURRENT_RUN_ID" ]; then
+              echo "더 이상 삭제할 과거 기록이 없습니다."
+              break
+            fi
+            
+            # 루프를 돌며 삭제 실행
+            for run_id in $runs; do
+              # 현재 돌아가고 있는 자기 자신은 지우지 않고 건너뜁니다.
+              if [ "$run_id" = "$CURRENT_RUN_ID" ]; then
+                continue
               fi
+              
+              echo "삭제 중인 ID: $run_id"
+              status_code=$(curl -X DELETE -s -w "%{http_code}" -o /dev/null \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                "https://github.com{{ github.repository }}/actions/runs/$run_id")
+              
+              if [ "$status_code" = "204" ]; then
+                echo "=> 삭제 성공"
+              else
+                echo "=> 삭제 실패 (HTTP 코드: $status_code)"
+              fi
+            done
+            
+            # API 제한(Rate Limit)을 방지하기 위해 1초간 휴식 후 다음 100개 확인
+            echo "다음 100개 묶음을 확인합니다..."
+            sleep 1
           done
-          echo "선택한 범위의 모든 워크플로우 삭제 프로세스가 완료되었습니다."
+          
+          echo "🎉 모든 과거 워크플로우 실행 기록이 성공적으로 청소되었습니다!"
